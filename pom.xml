@@ -16,6 +16,7 @@
 
     <modules>
         <module>model</module>
+        <module>controller</module>
     </modules>
 
     <properties>
@@ -39,6 +40,12 @@
             <dependency>
                 <groupId>by.example</groupId>
                 <artifactId>model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>by.example</groupId>
+                <artifactId>controller</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
