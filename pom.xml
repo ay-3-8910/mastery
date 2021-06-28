@@ -17,6 +17,7 @@
     <modules>
         <module>model</module>
         <module>controller</module>
+        <module>service</module>
     </modules>
 
     <properties>
@@ -48,6 +49,13 @@
                 <artifactId>controller</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>by.example</groupId>
+                <artifactId>service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
 </project>
