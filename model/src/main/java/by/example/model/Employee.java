@@ -1,25 +1,38 @@
 package by.example.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 
 /**
  * @author Sergey Tsynin
  * POJO Employee for model.
  */
+@Entity
+@Table(name = "employees")
 public class Employee {
 
+    @Id
+    @Column(name="employee_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer employeeId;
 
+    @Column(name = "first_name")
     private String firstName;
 
+    @Column(name="last_name")
     private String lastName;
 
+    @Column(name="department_id")
     private Integer departmentId;
 
+    @Column(name="job_title")
     private String jobTitle;
 
+    @Column(name="gender")
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Column(name="date_of_birth")
     private LocalDate dateOfBirth;
 
     /**
