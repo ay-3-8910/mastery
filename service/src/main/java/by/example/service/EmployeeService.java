@@ -1,9 +1,11 @@
 package by.example.service;
 
+import by.example.dao.EmployeeRepository;
 import by.example.model.Employee;
 import by.example.model.Gender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -17,6 +19,12 @@ import java.util.Optional;
  */
 @Service
 public class EmployeeService {
+
+    private final EmployeeRepository employeeRepository;
+
+    public EmployeeService(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeService.class);
 
@@ -99,5 +107,9 @@ public class EmployeeService {
         employee.setGender(Gender.UNSPECIFIED);
         employee.setDateOfBirth(LocalDate.now());
         return employee;
+    }
+
+    public List<Employee> findAll() {
+        return employeeRepository.findAll();
     }
 }
