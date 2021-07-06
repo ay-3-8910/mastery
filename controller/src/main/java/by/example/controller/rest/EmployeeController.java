@@ -102,4 +102,12 @@ public class EmployeeController {
         LOGGER.debug("Request to get count of employees");
         return new ResponseEntity<>(employeeService.getEmployeesCount(), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/test", produces = {"application/json"})
+    public final ResponseEntity<List<Employee>> findAll() {
+        LOGGER.debug("Employees list true request");
+        return new ResponseEntity<>(
+                employeeService.findAll(),
+                HttpStatus.OK);
+    }
 }
