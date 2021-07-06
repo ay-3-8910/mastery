@@ -18,6 +18,7 @@
         <module>model</module>
         <module>controller</module>
         <module>service</module>
+        <module>dao</module>
     </modules>
 
     <properties>
@@ -56,6 +57,12 @@
             <dependency>
                 <groupId>by.example</groupId>
                 <artifactId>service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>by.example</groupId>
+                <artifactId>dao</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
