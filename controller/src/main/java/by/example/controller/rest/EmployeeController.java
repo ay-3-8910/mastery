@@ -32,9 +32,9 @@ public class EmployeeController {
      */
     @GetMapping(value = "/employees", produces = {"application/json"})
     public final ResponseEntity<List<Employee>> getAll() {
-        LOGGER.debug("Employees list request");
+        LOGGER.debug("Employees list request from service");
         return new ResponseEntity<>(
-                employeeService.getAll(),
+                employeeService.findAll(),
                 HttpStatus.OK);
     }
 
@@ -46,7 +46,7 @@ public class EmployeeController {
      */
     @GetMapping(value = "/employees/{id}", produces = {"application/json"})
     public final ResponseEntity<Employee> getById(@PathVariable Integer id) {
-        LOGGER.debug("Employee id: {} request", id);
+        LOGGER.debug("Employee id: {} request from service", id);
         Optional<Employee> optionalEmployee = employeeService.getById(id);
         if (optionalEmployee.isEmpty()) {
             LOGGER.error("Employee not found for id: {}", id);
@@ -76,7 +76,7 @@ public class EmployeeController {
      */
     @PutMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
     public final ResponseEntity<Integer> update(@RequestBody Employee employee) {
-        LOGGER.debug("Request to update new employee");
+        LOGGER.debug("Request to update employee");
         return new ResponseEntity<>(employeeService.updateEmployee(employee), HttpStatus.OK);
     }
 
@@ -101,13 +101,5 @@ public class EmployeeController {
     public final ResponseEntity<Integer> count() {
         LOGGER.debug("Request to get count of employees");
         return new ResponseEntity<>(employeeService.getEmployeesCount(), HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/test", produces = {"application/json"})
-    public final ResponseEntity<List<Employee>> findAll() {
-        LOGGER.debug("Employees list true request");
-        return new ResponseEntity<>(
-                employeeService.findAll(),
-                HttpStatus.OK);
     }
 }

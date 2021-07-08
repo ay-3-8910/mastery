@@ -2,15 +2,10 @@ package by.example.service;
 
 import by.example.dao.EmployeeRepository;
 import by.example.model.Employee;
-import by.example.model.Gender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,14 +28,9 @@ public class EmployeeService {
      *
      * @return Employees list.
      */
-    public List<Employee> getAll() {
-        LOGGER.debug("Create fake list");
-        ArrayList<Employee> employees = new ArrayList<>();
-        employees.add(getFakeEmployee(1));
-        employees.add(getFakeEmployee(2));
-        employees.add(getFakeEmployee(3));
-        LOGGER.debug("Return fake list");
-        return employees;
+    public List<Employee> findAll() {
+        LOGGER.debug("Employees list request from repository");
+        return employeeRepository.findAll();
     }
 
     /**
@@ -50,8 +40,8 @@ public class EmployeeService {
      * @return employee.
      */
     public Optional<Employee> getById(Integer employeeId) {
-        LOGGER.debug("Get employee id: {}", employeeId);
-        return Optional.empty();
+        LOGGER.debug("Get employee id: {} from repository", employeeId);
+        return employeeRepository.findById(employeeId);
     }
 
     /**
@@ -61,8 +51,8 @@ public class EmployeeService {
      * @return saved employee Id.
      */
     public Integer createEmployee(Employee employee) {
-        LOGGER.debug("Create employee");
-        return 0;
+        LOGGER.debug("Save employee into repository");
+        return employeeRepository.save(employee).getEmployeeId();
     }
 
     /**
@@ -73,7 +63,8 @@ public class EmployeeService {
      */
     public Integer updateEmployee(Employee employee) {
         LOGGER.debug("Update employee");
-        return 0;
+        employeeRepository.save(employee);
+        return 1;
     }
 
     /**
@@ -83,8 +74,9 @@ public class EmployeeService {
      * @return number of deleted employees in the database.
      */
     public Integer deleteEmployee(Integer employeeId) {
-        LOGGER.debug("Delete employee");
-        return 0;
+        LOGGER.debug("Delete employee id: {}", employeeId);
+        employeeRepository.deleteById(employeeId);
+        return 1;
     }
 
     /**
@@ -94,22 +86,6 @@ public class EmployeeService {
      */
     public Integer getEmployeesCount() {
         LOGGER.debug("Get employees count");
-        return 0;
-    }
-
-    private Employee getFakeEmployee(Integer id) {
-        Employee employee = new Employee();
-        employee.setEmployeeId(id);
-        employee.setFirstName("FirstName" + id);
-        employee.setLastName("LastName" + id);
-        employee.setDepartmentId(id);
-        employee.setJobTitle("JobTitle" + id);
-        employee.setGender(Gender.UNSPECIFIED);
-        employee.setDateOfBirth(LocalDate.now());
-        return employee;
-    }
-
-    public List<Employee> findAll() {
-        return employeeRepository.findAll();
+        return Math.toIntExact(employeeRepository.count());
     }
 }
