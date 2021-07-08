@@ -12,27 +12,27 @@ import java.time.LocalDate;
 public class Employee {
 
     @Id
-    @Column(name="employee_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "employee_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer employeeId;
 
     @Column(name = "first_name")
     private String firstName;
 
-    @Column(name="last_name")
+    @Column(name = "last_name")
     private String lastName;
 
-    @Column(name="department_id")
+    @Column(name = "department_id")
     private Integer departmentId;
 
-    @Column(name="job_title")
+    @Column(name = "job_title")
     private String jobTitle;
 
-    @Column(name="gender")
+    @Column(name = "gender")
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name="date_of_birth")
+    @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
     /**
