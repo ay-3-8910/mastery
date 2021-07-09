@@ -19,6 +19,7 @@ public class EmployeeService {
 
     public EmployeeService(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
+        LOGGER.debug("Employees service was created");
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeService.class);
