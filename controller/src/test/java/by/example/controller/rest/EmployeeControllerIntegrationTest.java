@@ -2,6 +2,7 @@ package by.example.controller.rest;
 
 import by.example.model.Employee;
 import by.example.model.Gender;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,6 +56,16 @@ public class EmployeeControllerIntegrationTest {
     private EmployeeController employeeController;
 
     @Test
+    public void shouldReturnEmployeesList() throws Exception {
+        LOGGER.debug("shouldReturnEmployeesList()");
+
+        List<Employee> employees = employeeService.findAll();
+
+        assertNotNull(employees);
+        assertEquals(3, employees.size());
+    }
+
+    @Test
     public void shouldReturnEmployeeById() throws Exception {
         LOGGER.debug("shouldReturnEmployeeById()");
         Integer id = 2;
@@ -82,6 +94,15 @@ public class EmployeeControllerIntegrationTest {
     }
 
     private class MockMvcEmployeeService {
+
+        public List<Employee> findAll() throws Exception {
+            MockHttpServletResponse servletResponse = getHttpServletResponse(URI + "/");
+            assertNotNull(servletResponse);
+            return objectMapper.readValue(
+                    servletResponse.getContentAsString(),
+                    new TypeReference<>() {
+                    });
+        }
 
         public Optional<Employee> findById(Integer id) throws Exception {
             MockHttpServletResponse servletResponse = getHttpServletResponse(URI + "/" + id);
