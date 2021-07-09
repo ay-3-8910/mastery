@@ -85,12 +85,17 @@ public class EmployeeController {
      * Delete employee by Id.
      *
      * @param id employee Id.
-     * @return number of deleted employees in the database.
+     * @return equivalent HttpStatus and empty body.
      */
     @DeleteMapping(value = "/employees/{id}", produces = {"application/json"})
-    public final ResponseEntity<Integer> delete(@PathVariable Integer id) {
+    public final ResponseEntity<Void> delete(@PathVariable Integer id) {
         LOGGER.debug("Request to delete employee id: {} ", id);
-        return new ResponseEntity<>(employeeService.deleteEmployee(id), HttpStatus.NO_CONTENT);
+        if (employeeService.deleteEmployee(id)) {
+            LOGGER.debug("Return result - employee with id: {} deleted", id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        LOGGER.debug("Return result - employee with id: {} was not deleted because it was not found", id);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     /**

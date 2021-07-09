@@ -73,12 +73,17 @@ public class EmployeeService {
      * Delete employee by Id.
      *
      * @param employeeId employee Id.
-     * @return number of deleted employees in the database.
+     * @return has employee deleted.
      */
-    public Integer deleteEmployee(Integer employeeId) {
-        LOGGER.debug("Delete employee id: {}", employeeId);
-        employeeRepository.deleteById(employeeId);
-        return 1;
+    public boolean deleteEmployee(Integer employeeId) {
+        LOGGER.debug("Request to delete employee id: {}", employeeId);
+        if (employeeRepository.existsById(employeeId)) {
+            LOGGER.debug("deleting employee");
+            employeeRepository.deleteById(employeeId);
+            return true;
+        }
+        LOGGER.error("...but employee not found for delete!");
+        return false;
     }
 
     /**
