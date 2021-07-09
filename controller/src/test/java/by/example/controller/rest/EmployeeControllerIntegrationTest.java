@@ -23,8 +23,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * @author Sergey Tsynin
@@ -95,9 +94,7 @@ public class EmployeeControllerIntegrationTest {
     @Test
     public void shouldDeleteEmployee() throws Exception {
         LOGGER.debug("shouldDeleteEmployee()");
-        Integer deleteResponse = employeeService.deleteById(2);
-
-        assertEquals(1, deleteResponse);
+        employeeService.deleteById(2);
         assertEquals(2, employeeService.count());
     }
 
@@ -107,8 +104,10 @@ public class EmployeeControllerIntegrationTest {
                 MockMvcRequestBuilders.delete(URI + "/999")
         ).andDo(print())
                 .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").doesNotExist())
                 .andReturn().getResponse();
         assertNotNull(response);
+        assertEquals(3, employeeService.count());
     }
 
     @Test
@@ -138,13 +137,13 @@ public class EmployeeControllerIntegrationTest {
             return getOptionalEmployee(servletResponse);
         }
 
-        public Integer deleteById(Integer id) throws Exception {
+        public void deleteById(Integer id) throws Exception {
             MockHttpServletResponse servletResponse = mockMvc.perform(
                     MockMvcRequestBuilders.delete(URI + "/" + id))
                     .andExpect(status().isNoContent())
+                    .andExpect(jsonPath("$").doesNotExist())
                     .andReturn().getResponse();
             assertNotNull(servletResponse);
-            return getOptionalInteger(servletResponse);
         }
 
         public Integer count() throws Exception {
