@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -83,10 +85,33 @@ public class EmployeeControllerIntegrationTest {
         assertEquals(LocalDate.of(2018, 8, 16), employee.getDateOfBirth());
     }
 
-//    @Test
-//    public void shouldCreateEmployee() throws Exception {
-//    }
-//
+    @Test
+    public void shouldCreateEmployee() throws Exception {
+        LOGGER.debug("shouldCreateEmployee()");
+        Employee newEmployee = getFakeEmployee(128);
+        Integer newEmployeeId = employeeService.createEmployee(newEmployee);
+        assertNotNull(newEmployeeId);
+        assertEquals(4, newEmployeeId);
+        assertEquals(4, employeeService.count());
+    }
+
+    @Test
+    public void shouldReturnUnprocessableEntityIfCreateEmployeeWithNullFirstName() throws Exception {
+        LOGGER.debug("shouldReturnUnprocessableEntityIfCreateEmployeeWithNullFirstName()");
+        Employee newEmployee = getFakeEmployee(128);
+        newEmployee.setFirstName(null);
+        employeeService.tryToCreateEmployee(newEmployee);
+    }
+
+    @Test
+    public void shouldReturnUnprocessableEntityIfCreateEmployeeWithNullLastName() throws Exception {
+        LOGGER.debug("shouldReturnUnprocessableEntityIfCreateEmployeeWithNullLastName()");
+        Employee newEmployee = getFakeEmployee(128);
+        newEmployee.setLastName(null);
+        employeeService.tryToCreateEmployee(newEmployee);
+    }
+
+    //
 //    @Test
 //    public void shouldUpdateEmployee() throws Exception {
 //    }
@@ -120,6 +145,18 @@ public class EmployeeControllerIntegrationTest {
         assertEquals(3, employeesCount);
     }
 
+    private Employee getFakeEmployee(Integer id) {
+        Employee employee = new Employee();
+        employee.setEmployeeId(id);
+        employee.setFirstName("FirstName" + id);
+        employee.setLastName("LastName" + id);
+        employee.setDepartmentId(id);
+        employee.setJobTitle("JobTitle" + id);
+        employee.setGender(Gender.UNSPECIFIED);
+        employee.setDateOfBirth(LocalDate.now());
+        return employee;
+    }
+
     private class MockMvcEmployeeService {
 
         public List<Employee> findAll() throws Exception {
@@ -135,6 +172,19 @@ public class EmployeeControllerIntegrationTest {
             MockHttpServletResponse servletResponse = getHttpServletResponse(URI + "/" + id);
             assertNotNull(servletResponse);
             return getOptionalEmployee(servletResponse);
+        }
+
+        public Integer createEmployee(Employee employee) throws Exception {
+            String json = objectMapper.writeValueAsString(employee);
+            MockHttpServletResponse servletResponse = getHttpServletResponseForPost(json);
+            assertNotNull(servletResponse);
+            return getOptionalInteger(servletResponse);
+        }
+
+        public void tryToCreateEmployee(Employee employee) throws Exception {
+            String json = objectMapper.writeValueAsString(employee);
+            MockHttpServletResponse servletResponse = getHttpServletResponseForBadPost(json);
+            assertNotNull(servletResponse);
         }
 
         public void deleteById(Integer id) throws Exception {
@@ -157,6 +207,28 @@ public class EmployeeControllerIntegrationTest {
             ).andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(content().contentType("application/json"))
+                    .andReturn().getResponse();
+        }
+
+        private MockHttpServletResponse getHttpServletResponseForPost(String json) throws Exception {
+            return mockMvc.perform(post(URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+                    .accept(MediaType.APPLICATION_JSON)
+            ).andDo(print())
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType("application/json"))
+                    .andReturn().getResponse();
+        }
+
+        private MockHttpServletResponse getHttpServletResponseForBadPost(String json) throws Exception {
+            return mockMvc.perform(post(URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+                    .accept(MediaType.APPLICATION_JSON)
+            ).andDo(print())
+                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$").doesNotExist())
                     .andReturn().getResponse();
         }
 

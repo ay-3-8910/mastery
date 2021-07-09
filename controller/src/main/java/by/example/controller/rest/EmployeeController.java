@@ -66,7 +66,24 @@ public class EmployeeController {
     @PostMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
     public final ResponseEntity<Integer> create(@RequestBody Employee employee) {
         LOGGER.debug("Request to create new employee");
-        return new ResponseEntity<>(employeeService.createEmployee(employee), HttpStatus.CREATED);
+        if (employeeFieldsIsCorrect(employee, "Create")) {
+            return new ResponseEntity<>(employeeService.createEmployee(employee), HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    private boolean employeeFieldsIsCorrect(Employee employee, String stage) {
+        LOGGER.debug("Checking fields for correctness");
+        if (employee.getFirstName() == null) {
+            LOGGER.error(stage + " fail. Employee firstname is null");
+            return false;
+        }
+        if (employee.getLastName() == null) {
+            LOGGER.error(stage + " fail. Employee lastname is null");
+            return false;
+        }
+        LOGGER.debug("Fields are ok");
+        return true;
     }
 
     /**
