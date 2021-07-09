@@ -1,5 +1,7 @@
 package by.example.controller.rest;
 
+import by.example.model.Employee;
+import by.example.model.Gender;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -12,8 +14,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.time.LocalDate;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -42,80 +46,73 @@ public class EmployeeControllerIntegrationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private MockMvcEmployeeService employeeService = new MockMvcEmployeeService();
+
     @Autowired
     private MockMvc mockMvc;
 
     private EmployeeController employeeController;
 
-//    private EmployeeRepository employeeRepository;
+    @Test
+    public void shouldReturnEmployeeById() throws Exception {
+        LOGGER.debug("shouldReturnEmployeeById()");
+        Integer id = 2;
 
+        Optional<Employee> optionalEmployee = employeeService.findById(id);
+        assertTrue(optionalEmployee.isPresent());
 
-    //    public EmployeeControllerIntegrationTest(EmployeeController employeeController) {
-//        this.employeeController = employeeController;
-//    }
-//
-//    @BeforeEach
-//    public void setup() {
-//        mockMvc = MockMvcBuilders.standaloneSetup(employeeController)
-//                .setMessageConverters(new MappingJackson2HttpMessageConverter())
-////                .setControllerAdvice(customExceptionHandler)
-//                .alwaysDo(MockMvcResultHandlers.print())
-//                .build();
-//    }
-//    @Test
-//    public void testEmployeeRepositoryConnection() {
-//        LOGGER.debug("testEmployeeRepositoryConnection()");
-//        Optional<Employee> optionalEmployee = employeeRepository.findById(2);
-//        assertTrue(optionalEmployee.isPresent());
-//        Employee employee = optionalEmployee.get();
-//        System.out.println(employee);
-//    }
+        Employee employee = optionalEmployee.get();
+        assertEquals(2, employee.getEmployeeId());
+        assertEquals("Rudolph", employee.getFirstName());
+        assertEquals("the Deer", employee.getLastName());
+        assertEquals(2, employee.getDepartmentId());
+        assertEquals("bottles washer", employee.getJobTitle());
+        assertEquals(Gender.UNSPECIFIED, employee.getGender());
+        assertEquals(LocalDate.of(2018, 8, 16), employee.getDateOfBirth());
+    }
 
     @Test
     public void shouldReturnEmployeesCount() throws Exception {
         LOGGER.debug("shouldReturnEmployeesCount()");
 
-        MockHttpServletResponse response = mockMvc.perform(get(URI + "/count")
-        ).andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
-                .andReturn().getResponse();
+        Integer employeesCount = employeeService.count();
 
-        assertNotNull(response);
-        Integer employeesCount = objectMapper.readValue(
-                response.getContentAsString(),
-                Integer.class);
         assertNotNull(employeesCount);
-        assertEquals(6, employeesCount);
-
-//        List<Employee> allEmployees = employeeService.findAll();
-//
-//        given(employeeService.getAll()).willReturn(allEmployees);
-//
-//        mockMvc.perform(get(EMPLOYEE_ENDPOINT)
-//        ).andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$", hasSize(3)))
-//                .andExpect(jsonPath("$[0].firstName", is(allEmployees.get(0).getFirstName())))
-//                .andExpect(jsonPath("$[1].firstName", is(allEmployees.get(1).getFirstName())))
-//                .andExpect(jsonPath("$[2].firstName", is(allEmployees.get(2).getFirstName())))
-        ;
+        assertEquals(3, employeesCount);
     }
 
-//    class MockMvcEmployeeService {
-//
-//        public List<Employee> findAll() throws Exception {
-//            MockHttpServletResponse response = mockMvc.perform(get(EMPLOYEE_ENDPOINT)
-//                    .accept(MediaType.APPLICATION_JSON))
-//                    .andExpect(status().isOk())
-//                    .andReturn().getResponse();
-//
-//            assertNotNull(response);
-//
-//            return objectMapper.readValue(
-//                    response.getContentAsString(),
-//                    new TypeReference<>() {
-//                    });
-//        }
-//    }
+    private class MockMvcEmployeeService {
+
+        public Optional<Employee> findById(Integer id) throws Exception {
+            MockHttpServletResponse servletResponse = getHttpServletResponse(URI + "/" + id);
+            assertNotNull(servletResponse);
+            return getOptionalEmployee(servletResponse);
+        }
+
+        public Integer count() throws Exception {
+            MockHttpServletResponse servletResponse = getHttpServletResponse(URI + "/count");
+            assertNotNull(servletResponse);
+            return getOptionalInteger(servletResponse);
+        }
+
+        private MockHttpServletResponse getHttpServletResponse(String urlTemplate) throws Exception {
+            return mockMvc.perform(get(urlTemplate)
+            ).andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType("application/json"))
+                    .andReturn().getResponse();
+        }
+
+        private Optional<Employee> getOptionalEmployee(MockHttpServletResponse servletResponse) throws Exception {
+            return Optional.of(objectMapper.readValue(
+                    servletResponse.getContentAsString(),
+                    Employee.class));
+        }
+
+        private Integer getOptionalInteger(MockHttpServletResponse servletResponse) throws Exception {
+            return objectMapper.readValue(
+                    servletResponse.getContentAsString(),
+                    Integer.class);
+        }
+    }
 }
