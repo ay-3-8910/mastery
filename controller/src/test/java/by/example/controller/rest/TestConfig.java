@@ -25,12 +25,6 @@ public class TestConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestConfig.class);
 
-//    @Bean
-//    EmployeeRepository employeeRepository(){
-//        LOGGER.debug("Mockito.mock(EmployeeRepository.class) was created");
-//        return Mockito.mock(EmployeeRepository.class);
-//    }
-
     @Bean
     EmployeeService employeeService() {
         return new EmployeeService();
