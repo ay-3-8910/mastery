@@ -23,7 +23,16 @@ public class EmployeeController {
 
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
+        LOGGER.debug("Employees controller was created");
     }
+
+//    private final FakeEmployeeService employeeService;
+//
+//    public EmployeeController(FakeEmployeeService employeeService) {
+//        this.employeeService = employeeService;
+//        LOGGER.debug("Employees controller was created");
+//    }
+//
 
     /**
      * Employees list.
