@@ -14,6 +14,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -83,6 +84,33 @@ public class EmployeeControllerIntegrationTest {
         assertEquals(LocalDate.of(2018, 8, 16), employee.getDateOfBirth());
     }
 
+//    @Test
+//    public void shouldCreateEmployee() throws Exception {
+//    }
+//
+//    @Test
+//    public void shouldUpdateEmployee() throws Exception {
+//    }
+
+    @Test
+    public void shouldDeleteEmployee() throws Exception {
+        LOGGER.debug("shouldDeleteEmployee()");
+        Integer deleteResponse = employeeService.deleteById(2);
+
+        assertEquals(1, deleteResponse);
+        assertEquals(2, employeeService.count());
+    }
+
+    @Test
+    public void shouldReturnNotFoundForDeleteEmployeeWithWrongId() throws Exception {
+        MockHttpServletResponse response = mockMvc.perform(
+                MockMvcRequestBuilders.delete(URI + "/999")
+        ).andDo(print())
+                .andExpect(status().isNotFound())
+                .andReturn().getResponse();
+        assertNotNull(response);
+    }
+
     @Test
     public void shouldReturnEmployeesCount() throws Exception {
         LOGGER.debug("shouldReturnEmployeesCount()");
@@ -108,6 +136,15 @@ public class EmployeeControllerIntegrationTest {
             MockHttpServletResponse servletResponse = getHttpServletResponse(URI + "/" + id);
             assertNotNull(servletResponse);
             return getOptionalEmployee(servletResponse);
+        }
+
+        public Integer deleteById(Integer id) throws Exception {
+            MockHttpServletResponse servletResponse = mockMvc.perform(
+                    MockMvcRequestBuilders.delete(URI + "/" + id))
+                    .andExpect(status().isNoContent())
+                    .andReturn().getResponse();
+            assertNotNull(servletResponse);
+            return getOptionalInteger(servletResponse);
         }
 
         public Integer count() throws Exception {
