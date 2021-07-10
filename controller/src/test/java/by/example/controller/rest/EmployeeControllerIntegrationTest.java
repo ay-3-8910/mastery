@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class EmployeeControllerIntegrationTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeControllerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeControllerIntegrationTest.class);
 
     private static final String URI = "/employees";
 
