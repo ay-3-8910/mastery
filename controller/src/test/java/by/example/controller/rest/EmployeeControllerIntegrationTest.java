@@ -30,13 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Sergey Tsynin
  */
-//@Disabled
-//@DataJpaTest
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-//@EnableJpaRepositories("by.example.dao")
-//@SpringBootTest
-//@Transactional
-
 @WebMvcTest(controllers = EmployeeController.class)
 @ContextConfiguration(classes = TestConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -50,7 +43,7 @@ public class EmployeeControllerIntegrationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private MockMvcEmployeeService employeeService = new MockMvcEmployeeService();
+    private final MockMvcEmployeeService employeeService = new MockMvcEmployeeService();
 
     @Autowired
     private MockMvc mockMvc;
@@ -83,6 +76,18 @@ public class EmployeeControllerIntegrationTest {
         assertEquals("bottles washer", employee.getJobTitle());
         assertEquals(Gender.UNSPECIFIED, employee.getGender());
         assertEquals(LocalDate.of(2018, 8, 16), employee.getDateOfBirth());
+    }
+
+    @Test
+    public void shouldReturnNotFoundWithTryToFindUnknownId() throws Exception {
+        LOGGER.debug("shouldReturnNotFoundWithTryToFindUnknownId()");
+        MockHttpServletResponse response = mockMvc.perform(
+                MockMvcRequestBuilders.get(URI + "/999")
+        ).andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").doesNotExist())
+                .andReturn().getResponse();
+        assertNotNull(response);
     }
 
     @Test
@@ -230,13 +235,14 @@ public class EmployeeControllerIntegrationTest {
 
         public void tryToCreateEmployee(Employee employee) throws Exception {
             String json = objectMapper.writeValueAsString(employee);
-            MockHttpServletResponse servletResponse = getHttpServletResponseForBadPost(json);
+            MockHttpServletResponse servletResponse = getHttpServletResponseForBadPost(
+                    json, status().isUnprocessableEntity());
             assertNotNull(servletResponse);
         }
 
         public void update(Employee employee, ResultMatcher expectedStatus) throws Exception {
             String json = objectMapper.writeValueAsString(employee);
-            MockHttpServletResponse servletResponse = getHttpServletResponseForPut(json, expectedStatus);
+            MockHttpServletResponse servletResponse = getHttpServletResponseWithEmptyBody(json, expectedStatus);
             assertNotNull(servletResponse);
         }
 
@@ -274,18 +280,18 @@ public class EmployeeControllerIntegrationTest {
                     .andReturn().getResponse();
         }
 
-        private MockHttpServletResponse getHttpServletResponseForBadPost(String json) throws Exception {
+        private MockHttpServletResponse getHttpServletResponseForBadPost(String json, ResultMatcher expectedStatus) throws Exception {
             return mockMvc.perform(post(URI)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(json)
                     .accept(MediaType.APPLICATION_JSON)
             ).andDo(print())
-                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(expectedStatus)
                     .andExpect(jsonPath("$").doesNotExist())
                     .andReturn().getResponse();
         }
 
-        private MockHttpServletResponse getHttpServletResponseForPut(String json, ResultMatcher expectedStatus) throws Exception {
+        private MockHttpServletResponse getHttpServletResponseWithEmptyBody(String json, ResultMatcher expectedStatus) throws Exception {
             return mockMvc.perform(put(URI)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(json)
