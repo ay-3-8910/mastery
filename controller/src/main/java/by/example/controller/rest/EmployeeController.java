@@ -53,7 +53,7 @@ public class EmployeeController {
             LOGGER.error("Employee not found for id: {}", id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        LOGGER.debug("return employee id: {}", id);
+        LOGGER.debug("Return employee id: {}", id);
         return new ResponseEntity<>(optionalEmployee.get(), HttpStatus.OK);
     }
 
@@ -69,21 +69,8 @@ public class EmployeeController {
         if (employeeFieldsIsCorrect(employee, "Create")) {
             return new ResponseEntity<>(employeeService.createEmployee(employee), HttpStatus.CREATED);
         }
+        LOGGER.error("Return creating error");
         return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    private boolean employeeFieldsIsCorrect(Employee employee, String stage) {
-        LOGGER.debug("Checking fields for correctness");
-        if (employee.getFirstName() == null) {
-            LOGGER.error(stage + " fail. Employee firstname is null");
-            return false;
-        }
-        if (employee.getLastName() == null) {
-            LOGGER.error(stage + " fail. Employee lastname is null");
-            return false;
-        }
-        LOGGER.debug("Fields are ok");
-        return true;
     }
 
     /**
@@ -93,9 +80,19 @@ public class EmployeeController {
      * @return number of updated employees in the database.
      */
     @PutMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
-    public final ResponseEntity<Integer> update(@RequestBody Employee employee) {
-        LOGGER.debug("Request to update employee");
-        return new ResponseEntity<>(employeeService.updateEmployee(employee), HttpStatus.OK);
+    public final ResponseEntity<Void> update(@RequestBody Employee employee) {
+        Integer id = employee.getEmployeeId();
+        LOGGER.debug("Request to update employee id: {} ", id);
+        if (!employeeFieldsIsCorrect(employee, "Update")) {
+            LOGGER.error("Return updating error");
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        if (employeeService.updateEmployee(employee)) {
+            LOGGER.debug("Return result - employee with id: {} updated", id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        LOGGER.debug("Return result - employee with id: {} was not updated because it was not found", id);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -124,5 +121,19 @@ public class EmployeeController {
     public final ResponseEntity<Integer> count() {
         LOGGER.debug("Request to get count of employees");
         return new ResponseEntity<>(employeeService.getEmployeesCount(), HttpStatus.OK);
+    }
+
+    private boolean employeeFieldsIsCorrect(Employee employee, String stage) {
+        LOGGER.debug("Checking fields for correctness");
+        if (employee.getFirstName() == null) {
+            LOGGER.error(stage + " fail. Employee firstname is null");
+            return false;
+        }
+        if (employee.getLastName() == null) {
+            LOGGER.error(stage + " fail. Employee lastname is null");
+            return false;
+        }
+        LOGGER.debug("Fields are ok");
+        return true;
     }
 }

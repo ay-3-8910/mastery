@@ -15,6 +15,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
@@ -22,8 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -89,7 +89,7 @@ public class EmployeeControllerIntegrationTest {
     public void shouldCreateEmployee() throws Exception {
         LOGGER.debug("shouldCreateEmployee()");
         Employee newEmployee = getFakeEmployee(128);
-        Integer newEmployeeId = employeeService.createEmployee(newEmployee);
+        Integer newEmployeeId = employeeService.create(newEmployee);
         assertNotNull(newEmployeeId);
         assertEquals(4, newEmployeeId);
         assertEquals(4, employeeService.count());
@@ -111,10 +111,57 @@ public class EmployeeControllerIntegrationTest {
         employeeService.tryToCreateEmployee(newEmployee);
     }
 
-    //
-//    @Test
-//    public void shouldUpdateEmployee() throws Exception {
-//    }
+    @Test
+    public void shouldUpdateEmployee() throws Exception {
+        LOGGER.debug("shouldUpdateEmployee()");
+        Integer id = 2;
+        String newJobTitle = "head of bottles washing";
+
+        Optional<Employee> optionalEmployee = employeeService.findById(id);
+        assertTrue(optionalEmployee.isPresent());
+        Employee employee = optionalEmployee.get();
+        employee.setJobTitle(newJobTitle);
+        employeeService.update(employee, status().isOk());
+
+        assertEquals(3, employeeService.count());
+    }
+
+    @Test
+    public void shouldReturnNotFoundIfUpdateEmployeeWithUnknownId() throws Exception {
+        LOGGER.debug("shouldReturnNotFoundIfUpdateEmployeeWithUnknownId()");
+        Integer id = 2;
+        Integer newId = 99;
+
+        Optional<Employee> optionalEmployee = employeeService.findById(id);
+        assertTrue(optionalEmployee.isPresent());
+        Employee employee = optionalEmployee.get();
+        employee.setEmployeeId(newId);
+        employeeService.update(employee, status().isNotFound());
+
+        assertEquals(3, employeeService.count());
+    }
+
+    @Test
+    public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullFirstName() throws Exception {
+        LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullFirstName()");
+        Optional<Employee> optionalEmployee = employeeService.findById(2);
+        assertTrue(optionalEmployee.isPresent());
+        Employee employee = optionalEmployee.get();
+
+        employee.setFirstName(null);
+        employeeService.update(employee, status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullLastName() throws Exception {
+        LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullLastName()");
+        Optional<Employee> optionalEmployee = employeeService.findById(2);
+        assertTrue(optionalEmployee.isPresent());
+        Employee employee = optionalEmployee.get();
+
+        employee.setLastName(null);
+        employeeService.update(employee, status().isUnprocessableEntity());
+    }
 
     @Test
     public void shouldDeleteEmployee() throws Exception {
@@ -174,7 +221,7 @@ public class EmployeeControllerIntegrationTest {
             return getOptionalEmployee(servletResponse);
         }
 
-        public Integer createEmployee(Employee employee) throws Exception {
+        public Integer create(Employee employee) throws Exception {
             String json = objectMapper.writeValueAsString(employee);
             MockHttpServletResponse servletResponse = getHttpServletResponseForPost(json);
             assertNotNull(servletResponse);
@@ -184,6 +231,12 @@ public class EmployeeControllerIntegrationTest {
         public void tryToCreateEmployee(Employee employee) throws Exception {
             String json = objectMapper.writeValueAsString(employee);
             MockHttpServletResponse servletResponse = getHttpServletResponseForBadPost(json);
+            assertNotNull(servletResponse);
+        }
+
+        public void update(Employee employee, ResultMatcher expectedStatus) throws Exception {
+            String json = objectMapper.writeValueAsString(employee);
+            MockHttpServletResponse servletResponse = getHttpServletResponseForPut(json, expectedStatus);
             assertNotNull(servletResponse);
         }
 
@@ -228,6 +281,17 @@ public class EmployeeControllerIntegrationTest {
                     .accept(MediaType.APPLICATION_JSON)
             ).andDo(print())
                     .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$").doesNotExist())
+                    .andReturn().getResponse();
+        }
+
+        private MockHttpServletResponse getHttpServletResponseForPut(String json, ResultMatcher expectedStatus) throws Exception {
+            return mockMvc.perform(put(URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+                    .accept(MediaType.APPLICATION_JSON)
+            ).andDo(print())
+                    .andExpect(expectedStatus)
                     .andExpect(jsonPath("$").doesNotExist())
                     .andReturn().getResponse();
         }

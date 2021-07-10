@@ -61,12 +61,18 @@ public class EmployeeService {
      * Update employee record in the database.
      *
      * @param employee object.
-     * @return number of updated employees in the database.
+     * @return has employee updated.
      */
-    public Integer updateEmployee(Employee employee) {
-        LOGGER.debug("Update employee");
-        employeeRepository.save(employee);
-        return 1;
+    public Boolean updateEmployee(Employee employee) {
+        Integer id = employee.getEmployeeId();
+        LOGGER.debug("Request to update employee id: {}", id);
+        if (employeeRepository.existsById(id)) {
+            LOGGER.debug("updating employee");
+            employeeRepository.save(employee);
+            return true;
+        }
+        LOGGER.error("...but employee not found for update!");
+        return false;
     }
 
     /**
