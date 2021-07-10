@@ -77,7 +77,7 @@ public class EmployeeController {
      * Update employee record in the database.
      *
      * @param employee object.
-     * @return number of updated employees in the database.
+     * @return equivalent HttpStatus and empty body.
      */
     @PutMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
     public final ResponseEntity<Void> update(@RequestBody Employee employee) {
