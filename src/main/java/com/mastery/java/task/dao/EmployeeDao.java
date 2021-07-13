@@ -3,6 +3,7 @@ package com.mastery.java.task.dao;
 import com.mastery.java.task.dto.Employee;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -20,6 +21,22 @@ import java.util.List;
 @Repository
 public class EmployeeDao {
 
+    @SuppressWarnings("unused")
+    @Value("${sqlGetAllEmployee}")
+    private String sqlGetAllEmployee;
+
+    @SuppressWarnings("unused")
+    @Value("${sqlDeleteEmployeeById}")
+    private String sqlDeleteEmployeeById;
+
+    @SuppressWarnings("unused")
+    @Value("${sqlGetEmployeesCount}")
+    private String sqlGetEmployeesCount;
+
+//    @SuppressWarnings("unused")
+//    @Value("${}")
+//    private String;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeDao.class);
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -32,7 +49,6 @@ public class EmployeeDao {
 
     public List<Employee> findAll() {
         LOGGER.debug("Employees list request from database");
-        String sqlGetAllEmployee = "SELECT * FROM EMPLOYEES AS E ORDER BY E.EMPLOYEE_ID";
         List<Employee> employees = namedParameterJdbcTemplate.query(
                 sqlGetAllEmployee,
                 rowMapper);
@@ -42,7 +58,6 @@ public class EmployeeDao {
 
     public boolean deleteById(Integer id) {
         LOGGER.debug("Request to delete employee id: {}", id);
-        String sqlDeleteEmployeeById = "DELETE FROM EMPLOYEES WHERE EMPLOYEE_ID = :EMPLOYEE_ID";
         int numberOfDeletedEmployees = namedParameterJdbcTemplate.update(
                 sqlDeleteEmployeeById,
                 new MapSqlParameterSource("EMPLOYEE_ID", id));
@@ -52,7 +67,6 @@ public class EmployeeDao {
 
     public Integer count() {
         LOGGER.debug("Get employees count");
-        String sqlGetEmployeesCount = "SELECT COUNT(*) FROM EMPLOYEES";
         return namedParameterJdbcTemplate.queryForObject(
                 sqlGetEmployeesCount,
                 new HashMap<>(),
