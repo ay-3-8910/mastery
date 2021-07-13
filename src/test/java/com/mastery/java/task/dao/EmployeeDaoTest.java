@@ -1,6 +1,7 @@
 package com.mastery.java.task.dao;
 
 import com.mastery.java.task.config.AppConfiguration;
+import com.mastery.java.task.dto.Employee;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,21 +40,14 @@ class EmployeeDaoTest {
         assertEquals(3, employees);
     }
 
-//    @Test
-//    public void shouldReturnCountOfEmployees() {
-//        LOGGER.debug("shouldReturnCountOfEmployees()");
-//        Integer actualCount = employeeDao.findAll().size();
-//        assertEquals(actualCount, Math.toIntExact(employeeDao.count()));
-//    }
-//
-//    @Test
-//    public void shouldReturnEmployeesList() {
-//        LOGGER.debug("shouldReturnEmployeesList()");
-//        List<Employee> employees = employeeRepository.findAll();
-//        assertNotNull(employees);
-//        assertEquals(3, employees.size());
-//    }
-//
+    @Test
+    public void shouldReturnEmployeesList() {
+        LOGGER.debug("shouldReturnEmployeesList()");
+        List<Employee> employees = employeeDao.findAll();
+        assertNotNull(employees);
+        assertEquals(3, employees.size());
+    }
+
 //    @Test
 //    public void shouldReturnEmployee() {
 //        LOGGER.debug("shouldReturnEmployee()");
@@ -73,14 +69,14 @@ class EmployeeDaoTest {
 //        Optional<Employee> optionalEmployee = employeeRepository.findById(99);
 //        assertFalse(optionalEmployee.isPresent());
 //    }
-//
-//    @Test
-//    public void shouldReturnCountOfEmployees() {
-//        LOGGER.debug("shouldReturnCountOfEmployees()");
-//        Integer actualCount = employeeRepository.findAll().size();
-//        assertEquals(actualCount, Math.toIntExact(employeeRepository.count()));
-//    }
-//
+
+    @Test
+    public void shouldReturnCountOfEmployees() {
+        LOGGER.debug("shouldReturnCountOfEmployees()");
+        Integer actualCount = employeeDao.findAll().size();
+        assertEquals(actualCount, employeeDao.count());
+    }
+
 //    @Test
 //    public void shouldSaveNewEmployee() {
 //        LOGGER.debug("shouldSaveNewEmployee()");
