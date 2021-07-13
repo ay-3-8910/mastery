@@ -4,6 +4,7 @@ import com.mastery.java.task.dto.Employee;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -32,6 +34,10 @@ public class EmployeeDao {
     @SuppressWarnings("unused")
     @Value("${sqlGetEmployeesCount}")
     private String sqlGetEmployeesCount;
+
+    @SuppressWarnings("unused")
+    @Value("${sqlGetEmployeeById}")
+    private String sqlGetEmployeeById;
 
 //    @SuppressWarnings("unused")
 //    @Value("${}")
@@ -54,6 +60,15 @@ public class EmployeeDao {
                 rowMapper);
         LOGGER.debug("... found {} employee(s)", employees.size());
         return employees;
+    }
+
+    public Optional<Employee> findById(Integer id) {
+        LOGGER.debug("Get employee id: {} from database", id);
+        List<Employee> passengers = namedParameterJdbcTemplate.query(
+                sqlGetEmployeeById,
+                new MapSqlParameterSource("EMPLOYEE_ID", id),
+                rowMapper);
+        return Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
     }
 
     public boolean deleteById(Integer id) {

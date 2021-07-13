@@ -2,6 +2,7 @@ package com.mastery.java.task.dao;
 
 import com.mastery.java.task.config.AppConfiguration;
 import com.mastery.java.task.dto.Employee;
+import com.mastery.java.task.dto.Gender;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,27 +53,27 @@ class EmployeeDaoTest {
         assertEquals(3, employees.size());
     }
 
-//    @Test
-//    public void shouldReturnEmployee() {
-//        LOGGER.debug("shouldReturnEmployee()");
-//        Optional<Employee> optionalEmployee = employeeRepository.findById(2);
-//        assertTrue(optionalEmployee.isPresent());
-//        Employee employee = optionalEmployee.get();
-//        assertEquals(2, employee.getEmployeeId());
-//        assertEquals("Rudolph", employee.getFirstName());
-//        assertEquals("the Deer", employee.getLastName());
-//        assertEquals(2, employee.getDepartmentId());
-//        assertEquals("bottles washer", employee.getJobTitle());
-//        assertEquals(Gender.UNSPECIFIED, employee.getGender());
-//        assertEquals(LocalDate.of(2018, 8, 16), employee.getDateOfBirth());
-//    }
-//
-//    @Test
-//    public void shouldReturnEmptyOptionalWithUnknownEmployeeId() {
-//        LOGGER.debug("shouldReturnEmptyOptionalWithUnknownEmployeeId()");
-//        Optional<Employee> optionalEmployee = employeeRepository.findById(99);
-//        assertFalse(optionalEmployee.isPresent());
-//    }
+    @Test
+    public void shouldReturnEmployee() {
+        LOGGER.debug("shouldReturnEmployee()");
+        Optional<Employee> optionalEmployee = employeeDao.findById(2);
+        assertTrue(optionalEmployee.isPresent());
+        Employee employee = optionalEmployee.get();
+        assertEquals(2, employee.getEmployeeId());
+        assertEquals("Rudolph", employee.getFirstName());
+        assertEquals("the Deer", employee.getLastName());
+        assertEquals(2, employee.getDepartmentId());
+        assertEquals("bottles washer", employee.getJobTitle());
+        assertEquals(Gender.UNSPECIFIED, employee.getGender());
+        assertEquals(LocalDate.of(2018, 8, 16), employee.getDateOfBirth());
+    }
+
+    @Test
+    public void shouldReturnEmptyOptionalWithUnknownEmployeeId() {
+        LOGGER.debug("shouldReturnEmptyOptionalWithUnknownEmployeeId()");
+        Optional<Employee> optionalEmployee = employeeDao.findById(99);
+        assertFalse(optionalEmployee.isPresent());
+    }
 
     @Test
     public void shouldReturnCountOfEmployees() {
