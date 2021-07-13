@@ -11,8 +11,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Sergey Tsynin
@@ -43,5 +42,91 @@ class EmployeeDaoTest {
 //        LOGGER.debug("shouldReturnCountOfEmployees()");
 //        Integer actualCount = employeeDao.findAll().size();
 //        assertEquals(actualCount, Math.toIntExact(employeeDao.count()));
+//    }
+//
+//    @Test
+//    public void shouldReturnEmployeesList() {
+//        LOGGER.debug("shouldReturnEmployeesList()");
+//        List<Employee> employees = employeeRepository.findAll();
+//        assertNotNull(employees);
+//        assertEquals(3, employees.size());
+//    }
+//
+//    @Test
+//    public void shouldReturnEmployee() {
+//        LOGGER.debug("shouldReturnEmployee()");
+//        Optional<Employee> optionalEmployee = employeeRepository.findById(2);
+//        assertTrue(optionalEmployee.isPresent());
+//        Employee employee = optionalEmployee.get();
+//        assertEquals(2, employee.getEmployeeId());
+//        assertEquals("Rudolph", employee.getFirstName());
+//        assertEquals("the Deer", employee.getLastName());
+//        assertEquals(2, employee.getDepartmentId());
+//        assertEquals("bottles washer", employee.getJobTitle());
+//        assertEquals(Gender.UNSPECIFIED, employee.getGender());
+//        assertEquals(LocalDate.of(2018, 8, 16), employee.getDateOfBirth());
+//    }
+//
+//    @Test
+//    public void shouldReturnEmptyOptionalWithUnknownEmployeeId() {
+//        LOGGER.debug("shouldReturnEmptyOptionalWithUnknownEmployeeId()");
+//        Optional<Employee> optionalEmployee = employeeRepository.findById(99);
+//        assertFalse(optionalEmployee.isPresent());
+//    }
+//
+//    @Test
+//    public void shouldReturnCountOfEmployees() {
+//        LOGGER.debug("shouldReturnCountOfEmployees()");
+//        Integer actualCount = employeeRepository.findAll().size();
+//        assertEquals(actualCount, Math.toIntExact(employeeRepository.count()));
+//    }
+//
+//    @Test
+//    public void shouldSaveNewEmployee() {
+//        LOGGER.debug("shouldSaveNewEmployee()");
+//        long employeesCountBefore = employeeRepository.count();
+//        Employee newEmployee = getFakeEmployee(128);
+//        Employee savedEmployee = employeeRepository.save(newEmployee);
+//        assertEquals(4, savedEmployee.getEmployeeId());
+//        assertEquals(employeesCountBefore + 1, employeeRepository.count());
+//    }
+//
+//    @Test
+//    public void shouldUpdateEmployee() {
+//        LOGGER.debug("shouldUpdateEmployee()");
+//        long employeesCountBefore = employeeRepository.count();
+//        String newJobTitle = "head of bottles washers";
+//        Integer employeeId = 2;
+//        Optional<Employee> optionalEmployee = employeeRepository.findById(employeeId);
+//        assertTrue(optionalEmployee.isPresent());
+//
+//        Employee oldEmployee = optionalEmployee.get();
+//        oldEmployee.setJobTitle(newJobTitle);
+//        Employee savedEmployee = employeeRepository.save(oldEmployee);
+//        System.out.println(savedEmployee);
+//        assertEquals(employeesCountBefore, employeeRepository.count());
+//        Optional<Employee> updatedEmployee = employeeRepository.findById(employeeId);
+//        assertTrue(updatedEmployee.isPresent());
+//        assertEquals(newJobTitle, updatedEmployee.get().getJobTitle());
+//    }
+
+    @Test
+    public void shouldDeleteEmployee() {
+        LOGGER.debug("shouldDeleteEmployee()");
+        Integer employeesCountBefore = employeeDao.count();
+        assertTrue(employeeDao.deleteById(2));
+        assertEquals(employeesCountBefore - 1, employeeDao.count());
+    }
+
+//    private Employee getFakeEmployee(Integer id) {
+//        Employee employee = new Employee();
+//        employee.setEmployeeId(id);
+//        employee.setFirstName("FirstName" + id);
+//        employee.setLastName("LastName" + id);
+//        employee.setDepartmentId(id);
+//        employee.setJobTitle("JobTitle" + id);
+//        employee.setGender(Gender.UNSPECIFIED);
+//        employee.setDateOfBirth(LocalDate.now());
+//        return employee;
 //    }
 }
