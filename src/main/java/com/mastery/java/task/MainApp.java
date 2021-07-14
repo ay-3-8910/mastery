@@ -1,18 +1,16 @@
-package by.example.controller;
+package com.mastery.java.task;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * @author Sergey Tsynin
  */
 @SpringBootApplication
-@ComponentScan(basePackages = "by.example")
-@EnableJpaRepositories("by.example.dao")
-@EntityScan("by.example.model")
+@ComponentScan(basePackages = "com.mastery")
+@PropertySource({"classpath:sql.properties"})
 public class MainApp {
 
     public static void main(String[] args) {
