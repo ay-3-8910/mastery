@@ -38,14 +38,6 @@ class EmployeeDaoTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeDaoTest.class);
 
     @Test
-    void count() {
-        LOGGER.debug("fake count test()");
-        Integer employees = employeeDao.count();
-        assertNotNull(employees);
-        assertEquals(3, employees);
-    }
-
-    @Test
     public void shouldReturnEmployeesList() {
         LOGGER.debug("shouldReturnEmployeesList()");
         List<Employee> employees = employeeDao.findAll();
