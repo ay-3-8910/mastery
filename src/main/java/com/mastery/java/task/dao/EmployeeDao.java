@@ -58,6 +58,7 @@ public class EmployeeDao {
     RowMapper<Employee> rowMapper = BeanPropertyRowMapper.newInstance(Employee.class);
 
     public EmployeeDao(DataSource dataSource) {
+        LOGGER.debug("Employees DAO was created");
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
