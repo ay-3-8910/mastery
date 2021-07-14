@@ -79,23 +79,6 @@ public class EmployeeDao {
         return Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
     }
 
-    public boolean deleteById(Integer id) {
-        LOGGER.debug("Request to delete employee id: {}", id);
-        int numberOfDeletedEmployees = namedParameterJdbcTemplate.update(
-                sqlDeleteEmployeeById,
-                new MapSqlParameterSource("EMPLOYEE_ID", id));
-        LOGGER.debug("Numbers of deleted employees: {}", numberOfDeletedEmployees);
-        return numberOfDeletedEmployees > 0;
-    }
-
-    public Integer count() {
-        LOGGER.debug("Get employees count from database");
-        return namedParameterJdbcTemplate.queryForObject(
-                sqlGetEmployeesCount,
-                new HashMap<>(),
-                Integer.class);
-    }
-
     public Employee save(Employee employee) {
         LOGGER.debug("Save employee into database");
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -117,6 +100,23 @@ public class EmployeeDao {
                 sqlUpdateEmployee,
                 getParameterSource(employee));
         return employee;
+    }
+
+    public boolean deleteById(Integer id) {
+        LOGGER.debug("Request to delete employee id: {}", id);
+        int numberOfDeletedEmployees = namedParameterJdbcTemplate.update(
+                sqlDeleteEmployeeById,
+                new MapSqlParameterSource("EMPLOYEE_ID", id));
+        LOGGER.debug("Numbers of deleted employees: {}", numberOfDeletedEmployees);
+        return numberOfDeletedEmployees > 0;
+    }
+
+    public Integer count() {
+        LOGGER.debug("Get employees count from database");
+        return namedParameterJdbcTemplate.queryForObject(
+                sqlGetEmployeesCount,
+                new HashMap<>(),
+                Integer.class);
     }
 
     private SqlParameterSource getParameterSource(Employee employee) {
