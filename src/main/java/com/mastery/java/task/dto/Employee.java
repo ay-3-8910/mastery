@@ -6,6 +6,7 @@ package com.mastery.java.task.dto;
 //import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * @author Sergey Tsynin
@@ -114,5 +115,24 @@ public class Employee {
                 ", gender=" + gender +
                 ", dateOfBirth=" + dateOfBirth +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Employee employee = (Employee) o;
+        return Objects.equals(employeeId, employee.employeeId) &&
+                Objects.equals(firstName, employee.firstName) &&
+                Objects.equals(lastName, employee.lastName) &&
+                Objects.equals(departmentId, employee.departmentId) &&
+                Objects.equals(jobTitle, employee.jobTitle) &&
+                gender == employee.gender &&
+                Objects.equals(dateOfBirth, employee.dateOfBirth);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(employeeId, firstName, lastName, departmentId, jobTitle, gender, dateOfBirth);
     }
 }
