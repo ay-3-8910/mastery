@@ -1,9 +1,9 @@
 package com.mastery.java.task.dto;
 
-//import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-//import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-//import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -12,34 +12,22 @@ import java.util.Objects;
  * @author Sergey Tsynin
  * POJO Employee for model.
  */
-//@Entity
-//@Table(name = "employees")
 public class Employee {
 
-//    @Id
-//    @Column(name = "employee_id")
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer employeeId;
 
-//    @Column(name = "first_name")
     private String firstName;
 
-//    @Column(name = "last_name")
     private String lastName;
 
-//    @Column(name = "department_id")
     private Integer departmentId;
 
-//    @Column(name = "job_title")
     private String jobTitle;
 
-//    @Column(name = "gender")
-//    @Enumerated(EnumType.STRING)
     private Gender gender;
 
-//    @Column(name = "date_of_birth")
-//    @JsonDeserialize(using = LocalDateDeserializer.class)
-//    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate dateOfBirth;
 
     /**
