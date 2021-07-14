@@ -119,6 +119,10 @@ public class EmployeeDao {
                 Integer.class);
     }
 
+    public boolean existsById(Integer id) {
+        return this.findById(id).isPresent();
+    }
+
     private SqlParameterSource getParameterSource(Employee employee) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.
