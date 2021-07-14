@@ -68,8 +68,7 @@ public class EmployeeService {
         LOGGER.debug("Request to update employee id: {}", id);
         if (employeeDao.existsById(id)) {
             LOGGER.debug("updating employee");
-            employeeDao.update(employee);
-            return true;
+            return employee.equals(employeeDao.update(employee));
         }
         LOGGER.error("...but employee not found for update!");
         return false;
@@ -85,8 +84,7 @@ public class EmployeeService {
         LOGGER.debug("Request to delete employee id: {}", employeeId);
         if (employeeDao.existsById(employeeId)) {
             LOGGER.debug("deleting employee");
-            employeeDao.deleteById(employeeId);
-            return true;
+            return employeeDao.deleteById(employeeId);
         }
         LOGGER.error("...but employee not found for delete!");
         return false;
