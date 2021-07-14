@@ -85,24 +85,23 @@ class EmployeeDaoTest {
         assertEquals(newEmployee, employeeDao.findById(savedEmployee.getEmployeeId()).orElse(null));
     }
 
-//    @Test
-//    public void shouldUpdateEmployee() {
-//        LOGGER.debug("shouldUpdateEmployee()");
-//        long employeesCountBefore = employeeRepository.count();
-//        String newJobTitle = "head of bottles washers";
-//        Integer employeeId = 2;
-//        Optional<Employee> optionalEmployee = employeeRepository.findById(employeeId);
-//        assertTrue(optionalEmployee.isPresent());
-//
-//        Employee oldEmployee = optionalEmployee.get();
-//        oldEmployee.setJobTitle(newJobTitle);
-//        Employee savedEmployee = employeeRepository.save(oldEmployee);
-//        System.out.println(savedEmployee);
-//        assertEquals(employeesCountBefore, employeeRepository.count());
-//        Optional<Employee> updatedEmployee = employeeRepository.findById(employeeId);
-//        assertTrue(updatedEmployee.isPresent());
-//        assertEquals(newJobTitle, updatedEmployee.get().getJobTitle());
-//    }
+    @Test
+    public void shouldUpdateEmployee() {
+        LOGGER.debug("shouldUpdateEmployee()");
+        Integer employeesCountBefore = employeeDao.count();
+        String newJobTitle = "head of bottles washing";
+        Integer employeeId = 2;
+        Optional<Employee> optionalEmployee = employeeDao.findById(employeeId);
+        assertTrue(optionalEmployee.isPresent());
+
+        Employee oldEmployee = optionalEmployee.get();
+        oldEmployee.setJobTitle(newJobTitle);
+        employeeDao.update(oldEmployee);
+        assertEquals(employeesCountBefore, employeeDao.count());
+        Optional<Employee> updatedEmployee = employeeDao.findById(employeeId);
+        assertTrue(updatedEmployee.isPresent());
+        assertEquals(newJobTitle, updatedEmployee.get().getJobTitle());
+    }
 
     @Test
     public void shouldDeleteEmployee() {

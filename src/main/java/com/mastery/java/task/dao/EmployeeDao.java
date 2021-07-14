@@ -47,9 +47,9 @@ public class EmployeeDao {
     @Value("${sqlCreateEmployee}")
     private String sqlCreateEmployee;
 
-//    @SuppressWarnings("unused")
-//    @Value("${}")
-//    private String;
+    @SuppressWarnings("unused")
+    @Value("${sqlUpdateEmployee}")
+    private String sqlUpdateEmployee;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeDao.class);
 
@@ -108,6 +108,14 @@ public class EmployeeDao {
         employee.setEmployeeId(newEmployeeId);
         LOGGER.debug("New employee was created with id: {}", newEmployeeId);
         LOGGER.debug("{}", employee);
+        return employee;
+    }
+
+    public Employee update(Employee employee) {
+        LOGGER.debug("Update employee in database");
+        namedParameterJdbcTemplate.update(
+                sqlUpdateEmployee,
+                getParameterSource(employee));
         return employee;
     }
 
