@@ -22,7 +22,9 @@
         <junit.utReportFolder>${project.testResult.directory}/test</junit.utReportFolder>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-boot>2.4.4</spring-boot>
+        <spring-boot.version>2.4.4</spring-boot.version>
+        <jakarta.persistence-api.version>2.2.3</jakarta.persistence-api.version>
+        <postgresql.version>42.2.18</postgresql.version>
     </properties>
 
     <parent>
@@ -57,7 +59,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.18</version>
+            <version>${postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -65,14 +67,16 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
-            <version>2.2.3</version>
+            <version>${jakarta.persistence-api.version}</version>
         </dependency>
     </dependencies>
 
     <build>
+        <finalName>RestApplication</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -84,6 +88,24 @@
                     <excludes>
                         <exclude>**/*IntegrationTest*</exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- HTTP Server for web application -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.mastery.java.task.MainApp</mainClass>
                 </configuration>
             </plugin>
         </plugins>
