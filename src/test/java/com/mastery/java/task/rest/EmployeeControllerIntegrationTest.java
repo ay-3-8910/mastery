@@ -1,9 +1,9 @@
-package by.example.controller.rest;
+package com.mastery.java.task.rest;
 
-import by.example.model.Employee;
-import by.example.model.Gender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mastery.java.task.dto.Employee;
+import com.mastery.java.task.dto.Gender;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -31,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Sergey Tsynin
  */
 @WebMvcTest(controllers = EmployeeController.class)
-@ContextConfiguration(classes = TestConfig.class)
+//@ContextConfiguration(classes = TestConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = {"classpath:db-schema.sql", "classpath:db-init.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
