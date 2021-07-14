@@ -82,16 +82,17 @@ class EmployeeDaoTest {
         assertEquals(actualCount, employeeDao.count());
     }
 
-//    @Test
-//    public void shouldSaveNewEmployee() {
-//        LOGGER.debug("shouldSaveNewEmployee()");
-//        long employeesCountBefore = employeeRepository.count();
-//        Employee newEmployee = getFakeEmployee(128);
-//        Employee savedEmployee = employeeRepository.save(newEmployee);
-//        assertEquals(4, savedEmployee.getEmployeeId());
-//        assertEquals(employeesCountBefore + 1, employeeRepository.count());
-//    }
-//
+    @Test
+    public void shouldSaveNewEmployee() {
+        LOGGER.debug("shouldSaveNewEmployee()");
+        Integer employeesCountBefore = employeeDao.count();
+        Employee newEmployee = getFakeEmployee(128);
+        Employee savedEmployee = employeeDao.save(newEmployee);
+        assertEquals(4, savedEmployee.getEmployeeId());
+        assertEquals(employeesCountBefore + 1, employeeDao.count());
+        assertEquals(newEmployee, employeeDao.findById(savedEmployee.getEmployeeId()).orElse(null));
+    }
+
 //    @Test
 //    public void shouldUpdateEmployee() {
 //        LOGGER.debug("shouldUpdateEmployee()");
@@ -119,15 +120,15 @@ class EmployeeDaoTest {
         assertEquals(employeesCountBefore - 1, employeeDao.count());
     }
 
-//    private Employee getFakeEmployee(Integer id) {
-//        Employee employee = new Employee();
-//        employee.setEmployeeId(id);
-//        employee.setFirstName("FirstName" + id);
-//        employee.setLastName("LastName" + id);
-//        employee.setDepartmentId(id);
-//        employee.setJobTitle("JobTitle" + id);
-//        employee.setGender(Gender.UNSPECIFIED);
-//        employee.setDateOfBirth(LocalDate.now());
-//        return employee;
-//    }
+    private Employee getFakeEmployee(@SuppressWarnings("SameParameterValue") Integer id) {
+        Employee employee = new Employee();
+        employee.setEmployeeId(id);
+        employee.setFirstName("FirstName" + id);
+        employee.setLastName("LastName" + id);
+        employee.setDepartmentId(id);
+        employee.setJobTitle("JobTitle" + id);
+        employee.setGender(Gender.UNSPECIFIED);
+        employee.setDateOfBirth(LocalDate.now());
+        return employee;
+    }
 }

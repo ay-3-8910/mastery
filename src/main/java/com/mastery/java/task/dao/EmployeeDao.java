@@ -9,11 +9,15 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -38,6 +42,10 @@ public class EmployeeDao {
     @SuppressWarnings("unused")
     @Value("${sqlGetEmployeeById}")
     private String sqlGetEmployeeById;
+
+    @SuppressWarnings("unused")
+    @Value("${sqlCreateEmployee}")
+    private String sqlCreateEmployee;
 
 //    @SuppressWarnings("unused")
 //    @Value("${}")
@@ -76,15 +84,43 @@ public class EmployeeDao {
         int numberOfDeletedEmployees = namedParameterJdbcTemplate.update(
                 sqlDeleteEmployeeById,
                 new MapSqlParameterSource("EMPLOYEE_ID", id));
-        LOGGER.debug("Employees deleted: {}", numberOfDeletedEmployees);
+        LOGGER.debug("Numbers of deleted employees: {}", numberOfDeletedEmployees);
         return numberOfDeletedEmployees > 0;
     }
 
     public Integer count() {
-        LOGGER.debug("Get employees count");
+        LOGGER.debug("Get employees count from database");
         return namedParameterJdbcTemplate.queryForObject(
                 sqlGetEmployeesCount,
                 new HashMap<>(),
                 Integer.class);
+    }
+
+    public Employee save(Employee employee) {
+        LOGGER.debug("Save employee into database");
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        namedParameterJdbcTemplate.update(
+                sqlCreateEmployee,
+                getParameterSource(employee),
+                keyHolder, new String[]{"employee_id"});
+        Integer newEmployeeId = Objects.requireNonNull(keyHolder.getKey()).intValue();
+        employee.setEmployeeId(newEmployeeId);
+        LOGGER.debug("New employee was created with id: {}", newEmployeeId);
+        LOGGER.debug("{}", employee);
+        return employee;
+    }
+
+    private SqlParameterSource getParameterSource(Employee employee) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.
+                addValue("EMPLOYEE_ID", employee.getEmployeeId()).
+                addValue("FIRST_NAME", employee.getFirstName()).
+                addValue("LAST_NAME", employee.getLastName()).
+                addValue("DEPARTMENT_ID", employee.getDepartmentId()).
+                addValue("JOB_TITLE", employee.getJobTitle()).
+                addValue("GENDER", employee.getGender().name()).
+                addValue("DATE_OF_BIRTH", employee.getDateOfBirth());
+        return parameterSource;
     }
 }
