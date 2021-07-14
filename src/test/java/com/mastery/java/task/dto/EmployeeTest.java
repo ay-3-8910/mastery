@@ -1,4 +1,4 @@
-package by.example.model;
+package com.mastery.java.task.dto;
 
 import org.junit.jupiter.api.Test;
 
