@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +65,7 @@ public class EmployeeController {
      * @return saved employee Id.
      */
     @PostMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
-    public final ResponseEntity<Integer> create(@RequestBody Employee employee) {
+    public final ResponseEntity<Integer> create(@Valid @RequestBody Employee employee) {
         LOGGER.debug("Request to create new employee");
         if (employeeFieldsIsCorrect(employee, "Create")) {
             return new ResponseEntity<>(employeeService.createEmployee(employee), HttpStatus.CREATED);
