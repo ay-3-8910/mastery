@@ -4,13 +4,12 @@ import com.mastery.java.task.dao.EmployeeDao;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,17 +22,15 @@ import static org.mockito.Mockito.when;
 /**
  * @author Sergey Tsynin
  */
-@SpringBootTest
-@Import(EmployeeService.class)
-@ContextConfiguration(classes = EmployeeServiceTestConfig.class)
+@ExtendWith(MockitoExtension.class)
 class EmployeeServiceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceTest.class);
 
-    @Autowired
+    @InjectMocks
     EmployeeService employeeService;
 
-    @MockBean
+    @Mock
     private EmployeeDao employeeDao;
 
     @Test
