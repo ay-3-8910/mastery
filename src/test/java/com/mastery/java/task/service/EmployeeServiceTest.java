@@ -42,13 +42,12 @@ class EmployeeServiceTest {
         base.add(getFakeEmployee(1));
         base.add(getFakeEmployee(2));
         base.add(getFakeEmployee(3));
-
-        //when
         when(employeeDao.findAll()).thenReturn(base);
 
-        //then
+        //when
         List<Employee> employees = employeeService.findAll();
-        System.out.println(employees);
+
+        //then
         assertEquals(base, employees);
     }
 
@@ -58,12 +57,12 @@ class EmployeeServiceTest {
 
         // given
         Employee fakeEmployee = getFakeEmployee(1);
-
-        // when
         when(employeeDao.findById(1)).thenReturn(Optional.of(fakeEmployee));
 
-        //then
+        // when
         Optional<Employee> employee = employeeService.getById(1);
+
+        //then
         assertTrue(employee.isPresent());
         assertEquals(fakeEmployee, employee.get());
     }
@@ -74,12 +73,13 @@ class EmployeeServiceTest {
 
         // given
         Employee fakeEmployee = getFakeEmployee(22);
-
-        // when
         when(employeeDao.save(fakeEmployee)).thenReturn(fakeEmployee);
 
+        // when
+        Integer newFakeEmployeeId = employeeService.createEmployee(fakeEmployee);
+
         //then
-        assertEquals(22, employeeService.createEmployee(fakeEmployee));
+        assertEquals(22, newFakeEmployeeId);
     }
 
     @Test
@@ -88,13 +88,14 @@ class EmployeeServiceTest {
 
         // given
         Employee fakeEmployee = getFakeEmployee(22);
-
-        // when
         when(employeeDao.update(fakeEmployee)).thenReturn(fakeEmployee);
         when(employeeDao.existsById(22)).thenReturn(true);
 
+        // when
+        boolean isEmployeeUpdated = employeeService.updateEmployee(fakeEmployee);
+
         //then
-        assertEquals(true, employeeService.updateEmployee(fakeEmployee));
+        assertTrue(isEmployeeUpdated);
     }
 
     @Test
@@ -103,12 +104,13 @@ class EmployeeServiceTest {
 
         // given
         Employee fakeEmployee = getFakeEmployee(33);
-
-        // when
         when(employeeDao.existsById(33)).thenReturn(false);
 
+        // when
+        boolean isEmployeeUpdated = employeeService.updateEmployee(fakeEmployee);
+
         //then
-        assertEquals(false, employeeService.updateEmployee(fakeEmployee));
+        assertFalse(isEmployeeUpdated);
     }
 
     @Test
@@ -117,13 +119,14 @@ class EmployeeServiceTest {
 
         // given
         Integer fakeEmployeeId = 22;
-
-        // when
         when(employeeDao.deleteById(fakeEmployeeId)).thenReturn(true);
         when(employeeDao.existsById(fakeEmployeeId)).thenReturn(true);
 
+        // when
+        boolean isEmployeeDeleted = employeeService.deleteEmployee(fakeEmployeeId);
+
         //then
-        assertTrue(employeeService.deleteEmployee(fakeEmployeeId));
+        assertTrue(isEmployeeDeleted);
     }
 
     @Test
@@ -132,12 +135,13 @@ class EmployeeServiceTest {
 
         // given
         Integer fakeEmployeeId = 22;
-
-        // when
         when(employeeDao.existsById(fakeEmployeeId)).thenReturn(false);
 
+        // when
+        boolean isEmployeeDeleted = employeeService.deleteEmployee(fakeEmployeeId);
+
         //then
-        assertFalse(employeeService.deleteEmployee(fakeEmployeeId));
+        assertFalse(isEmployeeDeleted);
     }
 
 
@@ -145,11 +149,14 @@ class EmployeeServiceTest {
     void shouldReturnEmployeesCount() {
         LOGGER.debug("shouldReturnEmployeesCount()");
 
-        // when
+        // given
         when(employeeDao.count()).thenReturn(42);
 
+        // when
+        Integer employeesCount = employeeService.getEmployeesCount();
+
         //then
-        assertEquals(42, employeeService.getEmployeesCount());
+        assertEquals(42, employeesCount);
     }
 
     private Employee getFakeEmployee(Integer id) {
