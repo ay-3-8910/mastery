@@ -78,12 +78,14 @@ public class EmployeeDao {
                 sqlGetEmployeeById,
                 new MapSqlParameterSource("EMPLOYEE_ID", id),
                 rowMapper);
-        if (passengers.size() == 0) {
+        Optional<Employee> optionalEmployee = Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
+
+        if (optionalEmployee.isEmpty()) {
             String errorMessage = "Employee id:" + id + " was not found in database";
             LOGGER.error(errorMessage);
             throw new NotFoundEmployeeException(errorMessage);
         }
-        return Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
+        return optionalEmployee;
     }
 
     public Employee save(Employee employee) {
