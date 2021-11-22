@@ -28,7 +28,7 @@ public class Employee {
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
-    @EmployeeAgeConstraint(message = "the employee must be over 18 years old")
+    @EmployeeAgeConstraint(message = "The employee must be over 18 years old")
     private LocalDate dateOfBirth;
 
     /**
