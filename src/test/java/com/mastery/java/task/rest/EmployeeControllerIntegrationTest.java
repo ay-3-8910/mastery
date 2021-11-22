@@ -22,7 +22,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -98,8 +99,9 @@ public class EmployeeControllerIntegrationTest {
         Integer newEmployeeId = employeeService.create(newEmployee);
 
         assertNotNull(newEmployeeId);
-        assertEquals(4, newEmployeeId);
+        newEmployee.setEmployeeId(4);
         assertEquals(4, employeeService.count());
+        assertEquals(newEmployee, employeeService.findById(newEmployeeId));
     }
 
     @Test
