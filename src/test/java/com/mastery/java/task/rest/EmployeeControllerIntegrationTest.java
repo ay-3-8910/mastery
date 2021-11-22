@@ -110,7 +110,11 @@ public class EmployeeControllerIntegrationTest {
         LOGGER.debug("shouldReturnUnprocessableEntityIfCreateEmployeeWithNullFirstName()");
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setDateOfBirth(LocalDate.now());
-        employeeService.tryToCreateEmployee(newEmployee);
+
+        EmployeeErrorMessage errorMessage = getErrorMessage(employeeService.tryToCreateEmployee(newEmployee));
+
+        assertNotNull(errorMessage);
+        assertEquals("The employee must be over 18 years old", errorMessage.getInfo());
     }
 
     @Test
