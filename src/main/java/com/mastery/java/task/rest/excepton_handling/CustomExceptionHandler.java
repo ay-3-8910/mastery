@@ -39,6 +39,6 @@ public class CustomExceptionHandler {
         LOGGER.error("Handled unknown error");
         return new ResponseEntity<>(
                 new EmployeeErrorMessage(exception),
-                HttpStatus.UNPROCESSABLE_ENTITY);
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
