@@ -62,11 +62,7 @@ public class EmployeeController {
     @PostMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
     public final ResponseEntity<Integer> create(@Valid @RequestBody Employee employee) {
         LOGGER.debug("Request to create new employee");
-        if (employeeFieldsIsCorrect(employee, "Create")) {
-            return new ResponseEntity<>(employeeService.createEmployee(employee), HttpStatus.CREATED);
-        }
-        LOGGER.error("Return creating error");
-        return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<>(employeeService.createEmployee(employee), HttpStatus.CREATED);
     }
 
     /**

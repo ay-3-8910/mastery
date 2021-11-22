@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -16,6 +17,7 @@ public class Employee {
 
     private Integer employeeId;
 
+    @NotNull(message = "Employee firstname cannot be empty")
     private String firstName;
 
     private String lastName;

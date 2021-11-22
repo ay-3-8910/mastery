@@ -114,12 +114,17 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    @Disabled
     public void shouldReturnUnprocessableEntityIfCreateEmployeeWithNullFirstName() throws Exception {
         LOGGER.debug("shouldReturnUnprocessableEntityIfCreateEmployeeWithNullFirstName()");
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setFirstName(null);
-        employeeService.tryToCreateEmployee(newEmployee);
+        MockHttpServletResponse response = employeeService.tryToCreateEmployee(newEmployee);
+
+        EmployeeErrorMessage errorMessage = objectMapper.readValue(
+                response.getContentAsString(),
+                EmployeeErrorMessage.class);
+        assertNotNull(errorMessage);
+        assertEquals("Employee firstname cannot be empty", errorMessage.getInfo());
     }
 
     @Test
@@ -253,11 +258,12 @@ public class EmployeeControllerIntegrationTest {
             return getOptionalInteger(servletResponse);
         }
 
-        public void tryToCreateEmployee(Employee employee) throws Exception {
+        public MockHttpServletResponse tryToCreateEmployee(Employee employee) throws Exception {
             String json = objectMapper.writeValueAsString(employee);
             MockHttpServletResponse servletResponse = getHttpServletResponseForBadPost(
                     json, status().isUnprocessableEntity());
             assertNotNull(servletResponse);
+            return servletResponse;
         }
 
         public void update(Employee employee, ResultMatcher expectedStatus) throws Exception {
