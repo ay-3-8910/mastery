@@ -21,7 +21,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -65,10 +64,7 @@ public class EmployeeControllerIntegrationTest {
         LOGGER.debug("shouldReturnEmployeeById()");
         Integer id = 2;
 
-        Optional<Employee> optionalEmployee = employeeService.findById(id);
-        assertTrue(optionalEmployee.isPresent());
-
-        Employee employee = optionalEmployee.get();
+        Employee employee = employeeService.findById(id);
         assertEquals(2, employee.getEmployeeId());
         assertEquals("Rudolph", employee.getFirstName());
         assertEquals("the Deer", employee.getLastName());
@@ -147,9 +143,7 @@ public class EmployeeControllerIntegrationTest {
         Integer id = 2;
         String newJobTitle = "head of bottles washing";
 
-        Optional<Employee> optionalEmployee = employeeService.findById(id);
-        assertTrue(optionalEmployee.isPresent());
-        Employee employee = optionalEmployee.get();
+        Employee employee = employeeService.findById(id);
         employee.setJobTitle(newJobTitle);
         employeeService.update(employee, status().isOk());
 
@@ -162,9 +156,7 @@ public class EmployeeControllerIntegrationTest {
         Integer id = 2;
         Integer newId = 99;
 
-        Optional<Employee> optionalEmployee = employeeService.findById(id);
-        assertTrue(optionalEmployee.isPresent());
-        Employee employee = optionalEmployee.get();
+        Employee employee = employeeService.findById(id);
         employee.setEmployeeId(newId);
         employeeService.update(employee, status().isNotFound());
 
@@ -174,9 +166,7 @@ public class EmployeeControllerIntegrationTest {
     @Test
     public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullFirstName() throws Exception {
         LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullFirstName()");
-        Optional<Employee> optionalEmployee = employeeService.findById(2);
-        assertTrue(optionalEmployee.isPresent());
-        Employee employee = optionalEmployee.get();
+        Employee employee = employeeService.findById(2);
 
         employee.setFirstName(null);
         employeeService.update(employee, status().isUnprocessableEntity());
@@ -185,9 +175,7 @@ public class EmployeeControllerIntegrationTest {
     @Test
     public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullLastName() throws Exception {
         LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullLastName()");
-        Optional<Employee> optionalEmployee = employeeService.findById(2);
-        assertTrue(optionalEmployee.isPresent());
-        Employee employee = optionalEmployee.get();
+        Employee employee = employeeService.findById(2);
 
         employee.setLastName(null);
         employeeService.update(employee, status().isUnprocessableEntity());
@@ -257,17 +245,17 @@ public class EmployeeControllerIntegrationTest {
                     });
         }
 
-        public Optional<Employee> findById(Integer id) throws Exception {
+        public Employee findById(Integer id) throws Exception {
             MockHttpServletResponse servletResponse = getHttpServletResponse(URI + "/" + id);
             assertNotNull(servletResponse);
-            return getOptionalEmployee(servletResponse);
+            return getEmployee(servletResponse);
         }
 
         public Integer create(Employee employee) throws Exception {
             String json = objectMapper.writeValueAsString(employee);
             MockHttpServletResponse servletResponse = getHttpServletResponseForPost(json);
             assertNotNull(servletResponse);
-            return getOptionalInteger(servletResponse);
+            return getInteger(servletResponse);
         }
 
         public MockHttpServletResponse tryToCreateEmployee(Employee employee) throws Exception {
@@ -296,7 +284,7 @@ public class EmployeeControllerIntegrationTest {
         public Integer count() throws Exception {
             MockHttpServletResponse servletResponse = getHttpServletResponse(URI + "/count");
             assertNotNull(servletResponse);
-            return getOptionalInteger(servletResponse);
+            return getInteger(servletResponse);
         }
 
         private MockHttpServletResponse getHttpServletResponse(String urlTemplate) throws Exception {
@@ -339,13 +327,13 @@ public class EmployeeControllerIntegrationTest {
                     .andReturn().getResponse();
         }
 
-        private Optional<Employee> getOptionalEmployee(MockHttpServletResponse servletResponse) throws Exception {
-            return Optional.of(objectMapper.readValue(
+        private Employee getEmployee(MockHttpServletResponse servletResponse) throws Exception {
+            return objectMapper.readValue(
                     servletResponse.getContentAsString(),
-                    Employee.class));
+                    Employee.class);
         }
 
-        private Integer getOptionalInteger(MockHttpServletResponse servletResponse) throws Exception {
+        private Integer getInteger(MockHttpServletResponse servletResponse) throws Exception {
             return objectMapper.readValue(
                     servletResponse.getContentAsString(),
                     Integer.class);
