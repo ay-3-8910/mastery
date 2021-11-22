@@ -134,7 +134,10 @@ public class EmployeeControllerIntegrationTest {
         LOGGER.debug("shouldReturnUnprocessableEntityIfCreateEmployeeWithNullLastName()");
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setLastName(null);
-        employeeService.tryToCreateEmployee(newEmployee);
+        EmployeeErrorMessage errorMessage = getErrorMessage(employeeService.tryToCreateEmployee(newEmployee));
+
+        assertNotNull(errorMessage);
+        assertEquals("Employee lastname cannot be empty", errorMessage.getInfo());
     }
 
     @Test

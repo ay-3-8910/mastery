@@ -20,6 +20,7 @@ public class Employee {
     @NotNull(message = "Employee firstname cannot be empty")
     private String firstName;
 
+    @NotNull(message = "Employee lastname cannot be empty")
     private String lastName;
 
     private Integer departmentId;
