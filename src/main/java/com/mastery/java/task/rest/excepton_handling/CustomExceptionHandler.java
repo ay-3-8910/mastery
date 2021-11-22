@@ -16,9 +16,9 @@ public class CustomExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomExceptionHandler.class);
 
     @ExceptionHandler
-    public ResponseEntity<EmployeeIncorrectData> handleNotFoundException(NotFoundEmployeeException exception) {
+    public ResponseEntity<EmployeeErrorMessage> handleNotFoundException(NotFoundEmployeeException exception) {
         return new ResponseEntity<>(
-                new EmployeeIncorrectData(exception),
+                new EmployeeErrorMessage(exception),
                 HttpStatus.NOT_FOUND);
     }
 }

@@ -3,18 +3,18 @@ package com.mastery.java.task.rest.excepton_handling;
 /**
  * @author Sergey Tsynin
  */
-public class EmployeeIncorrectData {
+public class EmployeeErrorMessage {
 
     private String info;
 
-    public EmployeeIncorrectData() {
+    public EmployeeErrorMessage() {
     }
 
-    public EmployeeIncorrectData(Exception exception) {
+    public EmployeeErrorMessage(Exception exception) {
         this.info = exception.getMessage();
     }
 
-    public EmployeeIncorrectData(String info) {
+    public EmployeeErrorMessage(String info) {
         this.info = info;
     }
 
