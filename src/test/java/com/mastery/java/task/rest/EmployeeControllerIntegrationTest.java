@@ -150,6 +150,7 @@ public class EmployeeControllerIntegrationTest {
         employeeService.update(employee, status().isOk());
 
         assertEquals(3, employeeService.count());
+        assertEquals(newJobTitle,employeeService.findById(id).getJobTitle());
     }
 
     @Test
