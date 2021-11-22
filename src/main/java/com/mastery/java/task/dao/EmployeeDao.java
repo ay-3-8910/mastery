@@ -117,6 +117,14 @@ public class EmployeeDao {
                 sqlDeleteEmployeeById,
                 new MapSqlParameterSource("EMPLOYEE_ID", id));
         LOGGER.debug("Numbers of deleted employees: {}", numberOfDeletedEmployees);
+
+        if (numberOfDeletedEmployees == 0) {
+            LOGGER.error("Employee was not deleted because -");
+            String errorMessage = "Employee id:" + id + " was not found in database";
+            LOGGER.error(errorMessage);
+            throw new NotFoundEmployeeException(errorMessage);
+        }
+
         return numberOfDeletedEmployees > 0;
     }
 

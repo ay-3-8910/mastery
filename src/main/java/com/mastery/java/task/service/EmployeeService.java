@@ -81,12 +81,7 @@ public class EmployeeService {
      */
     public boolean deleteEmployee(Integer employeeId) {
         LOGGER.debug("Request to delete employee id: {}", employeeId);
-        if (employeeDao.existsById(employeeId)) {
-            LOGGER.debug("deleting employee");
-            return employeeDao.deleteById(employeeId);
-        }
-        LOGGER.error("...but employee not found for delete!");
-        return false;
+        return employeeDao.deleteById(employeeId);
     }
 
     /**

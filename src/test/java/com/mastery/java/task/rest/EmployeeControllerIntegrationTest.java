@@ -91,7 +91,7 @@ public class EmployeeControllerIntegrationTest {
                 response.getContentAsString(),
                 EmployeeErrorMessage.class);
         assertNotNull(errorMessage);
-        assertEquals("Employee id:999 was not found in database",errorMessage.getInfo());
+        assertEquals("Employee id:999 was not found in database", errorMessage.getInfo());
     }
 
     @Test
@@ -185,9 +185,15 @@ public class EmployeeControllerIntegrationTest {
                 MockMvcRequestBuilders.delete(URI + "/999")
         ).andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").doesNotExist())
                 .andReturn().getResponse();
         assertNotNull(response);
+
+        EmployeeErrorMessage errorMessage = objectMapper.readValue(
+                response.getContentAsString(),
+                EmployeeErrorMessage.class);
+        assertNotNull(errorMessage);
+        assertEquals("Employee id:999 was not found in database", errorMessage.getInfo());
+
         assertEquals(3, employeeService.count());
     }
 
