@@ -118,11 +118,9 @@ public class EmployeeControllerIntegrationTest {
         LOGGER.debug("shouldReturnUnprocessableEntityIfCreateEmployeeWithNullFirstName()");
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setFirstName(null);
-        MockHttpServletResponse response = employeeService.tryToCreateEmployee(newEmployee);
 
-        EmployeeErrorMessage errorMessage = objectMapper.readValue(
-                response.getContentAsString(),
-                EmployeeErrorMessage.class);
+        EmployeeErrorMessage errorMessage = getErrorMessage(employeeService.tryToCreateEmployee(newEmployee));
+
         assertNotNull(errorMessage);
         assertEquals("Employee firstname cannot be empty", errorMessage.getInfo());
     }
@@ -232,6 +230,12 @@ public class EmployeeControllerIntegrationTest {
         employee.setGender(Gender.UNSPECIFIED);
         employee.setDateOfBirth(LocalDate.now().minusYears(18));
         return employee;
+    }
+
+    private EmployeeErrorMessage getErrorMessage(MockHttpServletResponse response) throws Exception {
+        return objectMapper.readValue(
+                response.getContentAsString(),
+                EmployeeErrorMessage.class);
     }
 
     private class MockMvcEmployeeService {
