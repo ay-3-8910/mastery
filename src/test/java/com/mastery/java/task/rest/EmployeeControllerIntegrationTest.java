@@ -88,9 +88,8 @@ public class EmployeeControllerIntegrationTest {
                 .andReturn().getResponse();
         assertNotNull(response);
 
-        EmployeeErrorMessage errorMessage = objectMapper.readValue(
-                response.getContentAsString(),
-                EmployeeErrorMessage.class);
+        EmployeeErrorMessage errorMessage = getErrorMessage(response);
+
         assertNotNull(errorMessage);
         assertEquals("Employee id:999 was not found in database", errorMessage.getInfo());
     }
@@ -99,7 +98,9 @@ public class EmployeeControllerIntegrationTest {
     public void shouldCreateEmployee() throws Exception {
         LOGGER.debug("shouldCreateEmployee()");
         Employee newEmployee = getFakeEmployee(128);
+
         Integer newEmployeeId = employeeService.create(newEmployee);
+
         assertNotNull(newEmployeeId);
         assertEquals(4, newEmployeeId);
         assertEquals(4, employeeService.count());
@@ -107,7 +108,7 @@ public class EmployeeControllerIntegrationTest {
 
     @Test
     public void shouldReturnUnprocessableEntityIfCreateTooYoungEmployee() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfCreateEmployeeWithNullFirstName()");
+        LOGGER.debug("shouldReturnUnprocessableEntityIfCreateTooYoungEmployee()");
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setDateOfBirth(LocalDate.now());
 
