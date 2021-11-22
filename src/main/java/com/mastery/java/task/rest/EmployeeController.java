@@ -50,10 +50,6 @@ public class EmployeeController {
     public final ResponseEntity<Employee> getById(@PathVariable Integer id) {
         LOGGER.debug("Employee id: {} request from service", id);
         Optional<Employee> optionalEmployee = employeeService.getById(id);
-        if (optionalEmployee.isEmpty()) {
-            LOGGER.error("Employee not found for id: {}", id);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         LOGGER.debug("Return employee id: {}", id);
         return new ResponseEntity<>(optionalEmployee.get(), HttpStatus.OK);
     }

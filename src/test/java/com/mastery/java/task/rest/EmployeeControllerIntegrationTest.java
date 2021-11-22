@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
+import com.mastery.java.task.rest.excepton_handling.EmployeeErrorMessage;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,9 +84,14 @@ public class EmployeeControllerIntegrationTest {
                 MockMvcRequestBuilders.get(URI + "/999")
         ).andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").doesNotExist())
                 .andReturn().getResponse();
         assertNotNull(response);
+
+        EmployeeErrorMessage errorMessage = objectMapper.readValue(
+                response.getContentAsString(),
+                EmployeeErrorMessage.class);
+        assertNotNull(errorMessage);
+        assertEquals("Employee id:999 was not found in database",errorMessage.getInfo());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.mastery.java.task.dao;
 
 import com.mastery.java.task.dto.Employee;
+import com.mastery.java.task.rest.excepton_handling.NotFoundEmployeeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,6 +78,11 @@ public class EmployeeDao {
                 sqlGetEmployeeById,
                 new MapSqlParameterSource("EMPLOYEE_ID", id),
                 rowMapper);
+        if (passengers.size() == 0) {
+            String errorMessage = "Employee id:" + id + " was not found in database";
+            LOGGER.error(errorMessage);
+            throw new NotFoundEmployeeException(errorMessage);
+        }
         return Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
     }
 
