@@ -72,19 +72,23 @@ public class EmployeeController {
      * @return equivalent HttpStatus and empty body.
      */
     @PutMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
-    public final ResponseEntity<Void> update(@RequestBody Employee employee) {
+    public final ResponseEntity<Void> update(@Valid @RequestBody Employee employee) {
         Integer id = employee.getEmployeeId();
         LOGGER.debug("Request to update employee id: {} ", id);
-        if (!employeeFieldsIsCorrect(employee, "Update")) {
-            LOGGER.error("Return updating error");
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-        if (employeeService.updateEmployee(employee)) {
-            LOGGER.debug("Return result - employee with id: {} updated", id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        LOGGER.debug("Return result - employee with id: {} was not updated because it was not found", id);
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        employeeService.updateEmployee(employee);
+        return new ResponseEntity<>(HttpStatus.OK);
+
+//        if (!employeeFieldsIsCorrect(employee, "Update")) {
+//            LOGGER.error("Return updating error");
+//            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+//        }
+//        if (employeeService.updateEmployee(employee)) {
+//            LOGGER.debug("Return result - employee with id: {} updated", id);
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        }
+//        LOGGER.debug("Return result - employee with id: {} was not updated because it was not found", id);
+//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     /**
