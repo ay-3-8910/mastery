@@ -57,7 +57,7 @@ public class EmployeeController {
      * Create new employee record.
      *
      * @param employee object.
-     * @return saved employee Id.
+     * @return saved employee.
      */
     @PostMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
     public final ResponseEntity<Integer> create(@Valid @RequestBody Employee employee) {
