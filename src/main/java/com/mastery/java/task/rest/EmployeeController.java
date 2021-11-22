@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Sergey Tsynin
@@ -49,9 +48,9 @@ public class EmployeeController {
     @GetMapping(value = "/employees/{id}", produces = {"application/json"})
     public final ResponseEntity<Employee> getById(@PathVariable Integer id) {
         LOGGER.debug("Employee id: {} request from service", id);
-        Optional<Employee> optionalEmployee = employeeService.getById(id);
+        Employee employee = employeeService.getById(id);
         LOGGER.debug("Return employee id: {}", id);
-        return new ResponseEntity<>(optionalEmployee.get(), HttpStatus.OK);
+        return new ResponseEntity<>(employee, HttpStatus.OK);
     }
 
     /**

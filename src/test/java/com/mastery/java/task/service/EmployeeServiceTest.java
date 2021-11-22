@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -57,14 +56,13 @@ class EmployeeServiceTest {
 
         // given
         Employee fakeEmployee = getFakeEmployee(1);
-        when(employeeDao.findById(1)).thenReturn(Optional.of(fakeEmployee));
+        when(employeeDao.findById(1)).thenReturn(fakeEmployee);
 
         // when
-        Optional<Employee> employee = employeeService.getById(1);
+        Employee employee = employeeService.getById(1);
 
         //then
-        assertTrue(employee.isPresent());
-        assertEquals(fakeEmployee, employee.get());
+        assertEquals(fakeEmployee, employee);
     }
 
     @Test

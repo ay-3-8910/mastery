@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Sergey Tsynin
@@ -41,7 +40,7 @@ public class EmployeeService {
      * @param employeeId train Id.
      * @return employee.
      */
-    public Optional<Employee> getById(Integer employeeId) {
+    public Employee getById(Integer employeeId) {
         LOGGER.debug("Get employee id: {} from repository", employeeId);
         return employeeDao.findById(employeeId);
     }

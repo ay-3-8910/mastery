@@ -72,7 +72,7 @@ public class EmployeeDao {
         return employees;
     }
 
-    public Optional<Employee> findById(Integer id) {
+    public Employee findById(Integer id) {
         LOGGER.debug("Get employee id: {} from database", id);
         List<Employee> passengers = namedParameterJdbcTemplate.query(
                 sqlGetEmployeeById,
@@ -85,7 +85,7 @@ public class EmployeeDao {
             LOGGER.error(errorMessage);
             throw new NotFoundEmployeeException(errorMessage);
         }
-        return optionalEmployee;
+        return optionalEmployee.get();
     }
 
     public Employee save(Employee employee) {
@@ -128,8 +128,15 @@ public class EmployeeDao {
                 Integer.class);
     }
 
+    // TODO remove
     public boolean existsById(Integer id) {
-        return this.findById(id).isPresent();
+        List<Employee> passengers = namedParameterJdbcTemplate.query(
+                sqlGetEmployeeById,
+                new MapSqlParameterSource("EMPLOYEE_ID", id),
+                rowMapper);
+        Optional<Employee> optionalEmployee = Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
+
+        return optionalEmployee.isPresent();
     }
 
     private SqlParameterSource getParameterSource(Employee employee) {
