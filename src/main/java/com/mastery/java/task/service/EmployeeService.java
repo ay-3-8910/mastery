@@ -88,4 +88,14 @@ public class EmployeeService {
         LOGGER.debug("Get employees count");
         return Math.toIntExact(employeeDao.count());
     }
+
+    /**
+     * Check if employee exists in the database.
+     *
+     * @param employeeId employee Id.
+     */
+    public boolean isEmployeeExists(Integer employeeId) {
+        LOGGER.debug("Check if employee exists");
+        return employeeDao.existsById(employeeId);
+    }
 }
