@@ -88,14 +88,14 @@ public class EmployeeControllerIntegrationTest {
         LOGGER.debug("shouldCreateEmployee()");
         Employee newEmployee = getFakeEmployee(128);
 
-        Integer newEmployeeId = extractInteger(employeeService.create(
+        Employee returnedEmployee = extractEmployee(employeeService.create(
                 newEmployee,
                 status().isCreated()));
 
-        assertNotNull(newEmployeeId);
         newEmployee.setEmployeeId(4);
         assertEquals(4, employeeService.count());
-        assertEquals(newEmployee, employeeService.findById(newEmployeeId));
+        assertEquals(newEmployee, returnedEmployee);
+        assertEquals(newEmployee, employeeService.findById(returnedEmployee.getEmployeeId()));
     }
 
     @Test
@@ -147,9 +147,10 @@ public class EmployeeControllerIntegrationTest {
 
         Employee employee = employeeService.findById(id);
         employee.setJobTitle(newJobTitle);
-        employeeService.update(id, employee, status().isOk());
+        String returnedJobTitle = extractEmployee(employeeService.update(id, employee, status().isOk())).getJobTitle();
 
         assertEquals(3, employeeService.count());
+        assertEquals(newJobTitle, returnedJobTitle);
         assertEquals(newJobTitle, employeeService.findById(id).getJobTitle());
     }
 
@@ -159,9 +160,10 @@ public class EmployeeControllerIntegrationTest {
         Integer id = 99;
         Employee newEmployee = getFakeEmployee(id);
 
-        employeeService.update(id, newEmployee, status().isCreated());
+        Employee employee = extractEmployee(employeeService.update(id, newEmployee, status().isCreated()));
 
         assertEquals(4, employeeService.count());
+        assertEquals(4, employee.getEmployeeId());
     }
 
     @Test
@@ -171,8 +173,14 @@ public class EmployeeControllerIntegrationTest {
         Employee employee = employeeService.findById(id);
 
         employee.setFirstName(null);
-        employeeService.update(id, employee, status().isUnprocessableEntity());
+        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
+                id,
+                employee,
+                status().isUnprocessableEntity()));
         assertEquals(3, employeeService.count());
+
+        assertNotNull(errorMessage);
+        assertEquals("Employee firstname cannot be empty", errorMessage.getInfo());
     }
 
     @Test
@@ -182,8 +190,14 @@ public class EmployeeControllerIntegrationTest {
         Employee employee = employeeService.findById(id);
 
         employee.setLastName(null);
-        employeeService.update(id, employee, status().isUnprocessableEntity());
+        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
+                id,
+                employee,
+                status().isUnprocessableEntity()));
         assertEquals(3, employeeService.count());
+
+        assertNotNull(errorMessage);
+        assertEquals("Employee lastname cannot be empty", errorMessage.getInfo());
     }
 
     @Test
@@ -193,8 +207,14 @@ public class EmployeeControllerIntegrationTest {
         Employee employee = employeeService.findById(id);
 
         employee.setDateOfBirth(LocalDate.now());
-        employeeService.update(id, employee, status().isUnprocessableEntity());
+        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
+                id,
+                employee,
+                status().isUnprocessableEntity()));
         assertEquals(3, employeeService.count());
+
+        assertNotNull(errorMessage);
+        assertEquals("The employee must be over 18 years old", errorMessage.getInfo());
     }
 
     @Test
@@ -273,13 +293,15 @@ public class EmployeeControllerIntegrationTest {
             return extractEmployee(read(id, status().isOk()));
         }
 
-        public MockHttpServletResponse read(Integer id, ResultMatcher expectedStatus) throws Exception {
+        public MockHttpServletResponse read(Integer id,
+                                            ResultMatcher expectedStatus) throws Exception {
             MockHttpServletResponse servletResponse = executeGetMethod(URI + "/" + id, expectedStatus);
             assertNotNull(servletResponse);
             return servletResponse;
         }
 
-        public MockHttpServletResponse create(Employee employee, ResultMatcher expectedStatus) throws Exception {
+        public MockHttpServletResponse create(Employee employee,
+                                              ResultMatcher expectedStatus) throws Exception {
             String json = objectMapper.writeValueAsString(employee);
             MockHttpServletResponse servletResponse = executePostMethod(
                     json,
@@ -289,15 +311,16 @@ public class EmployeeControllerIntegrationTest {
             return servletResponse;
         }
 
-        public void update(Integer id,
-                           Employee employee,
-                           ResultMatcher expectedStatus) throws Exception {
+        public MockHttpServletResponse update(Integer id,
+                                              Employee employee,
+                                              ResultMatcher expectedStatus) throws Exception {
             String json = objectMapper.writeValueAsString(employee);
             MockHttpServletResponse servletResponse = executePutMethod(
                     id,
                     json,
                     expectedStatus);
             assertNotNull(servletResponse);
+            return servletResponse;
         }
 
         public MockHttpServletResponse delete(Integer id,
