@@ -55,15 +55,13 @@ class EmployeeDaoTest {
         assertEquals(2, employee.getDepartmentId());
         assertEquals("bottles washer", employee.getJobTitle());
         assertEquals(Gender.UNSPECIFIED, employee.getGender());
-        assertEquals(LocalDate.of(2018, 8, 16), employee.getDateOfBirth());
+        assertEquals(LocalDate.of(2000, 8, 16), employee.getDateOfBirth());
     }
 
     @Test
     public void shouldReturnExceptionWithUnknownEmployeeId() {
         LOGGER.debug("shouldReturnExceptionWithUnknownEmployeeId()");
-        Exception exception = assertThrows(NotFoundEmployeeException.class, () -> {
-            employeeDao.findById(99);
-        });
+        Exception exception = assertThrows(NotFoundEmployeeException.class, () -> employeeDao.findById(99));
         assertEquals("Employee id:99 was not found in database", exception.getMessage());
     }
 
