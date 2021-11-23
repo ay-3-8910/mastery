@@ -85,17 +85,6 @@ public class EmployeeController {
         LOGGER.warn("Id: {} was not found in database, creating new employee", id);
         employeeService.createEmployee(employee);
         return new ResponseEntity<>(HttpStatus.CREATED);
-
-//        if (!employeeFieldsIsCorrect(employee, "Update")) {
-//            LOGGER.error("Return updating error");
-//            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-//        }
-//        if (employeeService.updateEmployee(employee)) {
-//            LOGGER.debug("Return result - employee with id: {} updated", id);
-//            return new ResponseEntity<>(HttpStatus.OK);
-//        }
-//        LOGGER.debug("Return result - employee with id: {} was not updated because it was not found", id);
-//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -121,19 +110,5 @@ public class EmployeeController {
     public final ResponseEntity<Integer> count() {
         LOGGER.debug("Request to get count of employees");
         return new ResponseEntity<>(employeeService.getEmployeesCount(), HttpStatus.OK);
-    }
-
-    private boolean employeeFieldsIsCorrect(Employee employee, String stage) {
-        LOGGER.debug("Checking fields for correctness");
-        if (employee.getFirstName() == null) {
-            LOGGER.error(stage + " fail. Employee firstname is null");
-            return false;
-        }
-        if (employee.getLastName() == null) {
-            LOGGER.error(stage + " fail. Employee lastname is null");
-            return false;
-        }
-        LOGGER.debug("Fields are ok");
-        return true;
     }
 }
