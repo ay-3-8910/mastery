@@ -49,23 +49,23 @@ public class EmployeeService {
      * Save new employee record.
      *
      * @param employee object.
-     * @return saved employee Id.
+     * @return saved employee.
      */
-    public Integer createEmployee(Employee employee) {
+    public Employee createEmployee(Employee employee) {
         LOGGER.debug("Save employee into repository");
-        return employeeDao.save(employee).getEmployeeId();
+        return employeeDao.save(employee);
     }
 
     /**
      * Update employee record in the database.
      *
      * @param employee object.
-     * @return has employee updated.
+     * @return updated employee.
      */
-    public Boolean updateEmployee(Employee employee) {
+    public Employee updateEmployee(Employee employee) {
         Integer id = employee.getEmployeeId();
         LOGGER.debug("Request to update employee id: {}", id);
-        return employee.equals(employeeDao.update(employee));
+        return employeeDao.update(employee);
     }
 
     /**

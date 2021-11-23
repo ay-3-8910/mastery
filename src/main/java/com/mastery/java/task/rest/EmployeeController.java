@@ -60,7 +60,7 @@ public class EmployeeController {
      * @return saved employee.
      */
     @PostMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
-    public final ResponseEntity<Integer> create(@Valid @RequestBody Employee employee) {
+    public final ResponseEntity<Employee> create(@Valid @RequestBody Employee employee) {
         LOGGER.debug("Request to create new employee");
         return new ResponseEntity<>(employeeService.createEmployee(employee), HttpStatus.CREATED);
     }
@@ -72,19 +72,21 @@ public class EmployeeController {
      * @return equivalent HttpStatus and empty body.
      */
     @PutMapping(value = "/employees/{id}", consumes = {"application/json"}, produces = {"application/json"})
-    public final ResponseEntity<Void> update(@PathVariable Integer id, @Valid @RequestBody Employee employee) {
+    public final ResponseEntity<Employee> update(@PathVariable Integer id, @Valid @RequestBody Employee employee) {
         LOGGER.debug("Request to update employee id: {} ", id);
+        Employee returnedEmployee;
 
         if (employeeService.isEmployeeExists(id)) {
             LOGGER.debug("Execute update");
-            employeeService.updateEmployee(employee);
+            returnedEmployee = employeeService.updateEmployee(employee);
             LOGGER.debug("Return result - employee with id: {} updated", id);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(returnedEmployee, HttpStatus.OK);
         }
         LOGGER.debug("Redirect to create new employee");
         LOGGER.warn("Id: {} was not found in database, creating new employee", id);
-        employeeService.createEmployee(employee);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        returnedEmployee = employeeService.createEmployee(employee);
+        LOGGER.debug("New employee was created with id: {}", returnedEmployee.getEmployeeId());
+        return new ResponseEntity<>(returnedEmployee, HttpStatus.CREATED);
     }
 
     /**
