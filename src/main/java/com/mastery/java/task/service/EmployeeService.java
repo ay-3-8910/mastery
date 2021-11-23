@@ -65,12 +65,7 @@ public class EmployeeService {
     public Boolean updateEmployee(Employee employee) {
         Integer id = employee.getEmployeeId();
         LOGGER.debug("Request to update employee id: {}", id);
-        if (employeeDao.existsById(id)) {
-            LOGGER.debug("updating employee");
-            return employee.equals(employeeDao.update(employee));
-        }
-        LOGGER.error("...but employee not found for update!");
-        return false;
+        return employee.equals(employeeDao.update(employee));
     }
 
     /**
