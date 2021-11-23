@@ -71,13 +71,20 @@ public class EmployeeController {
      * @param employee object.
      * @return equivalent HttpStatus and empty body.
      */
-    @PutMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
-    public final ResponseEntity<Void> update(@Valid @RequestBody Employee employee) {
-        Integer id = employee.getEmployeeId();
+    @PutMapping(value = "/employees/{id}", consumes = {"application/json"}, produces = {"application/json"})
+    public final ResponseEntity<Void> update(@PathVariable Integer id, @Valid @RequestBody Employee employee) {
         LOGGER.debug("Request to update employee id: {} ", id);
 
-        employeeService.updateEmployee(employee);
-        return new ResponseEntity<>(HttpStatus.OK);
+        if (employeeService.isEmployeeExists(id)) {
+            LOGGER.debug("Execute update");
+            employeeService.updateEmployee(employee);
+            LOGGER.debug("Return result - employee with id: {} updated", id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        LOGGER.debug("Redirect to create new employee");
+        LOGGER.warn("Id: {} was not found in database, creating new employee", id);
+        employeeService.createEmployee(employee);
+        return new ResponseEntity<>(HttpStatus.CREATED);
 
 //        if (!employeeFieldsIsCorrect(employee, "Update")) {
 //            LOGGER.error("Return updating error");
