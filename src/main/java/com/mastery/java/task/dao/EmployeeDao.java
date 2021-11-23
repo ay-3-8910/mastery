@@ -136,13 +136,13 @@ public class EmployeeDao {
                 Integer.class);
     }
 
-    // TODO remove
     public boolean existsById(Integer id) {
         List<Employee> passengers = namedParameterJdbcTemplate.query(
                 sqlGetEmployeeById,
                 new MapSqlParameterSource("EMPLOYEE_ID", id),
                 rowMapper);
         Optional<Employee> optionalEmployee = Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
+        LOGGER.debug("Employee with id: {} is exists - {}", id, optionalEmployee.isPresent());
 
         return optionalEmployee.isPresent();
     }
