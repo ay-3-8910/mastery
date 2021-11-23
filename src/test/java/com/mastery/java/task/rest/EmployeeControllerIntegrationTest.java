@@ -147,7 +147,7 @@ public class EmployeeControllerIntegrationTest {
 
         Employee employee = employeeService.findById(id);
         employee.setJobTitle(newJobTitle);
-        employeeService.update(employee, status().isOk());
+        employeeService.update(id, employee, status().isOk());
 
         assertEquals(3, employeeService.count());
         assertEquals(newJobTitle,employeeService.findById(id).getJobTitle());
@@ -172,7 +172,8 @@ public class EmployeeControllerIntegrationTest {
         Employee employee = employeeService.findById(2);
 
         employee.setFirstName(null);
-        employeeService.update(employee, status().isUnprocessableEntity());
+        employeeService.update(id, employee, status().isUnprocessableEntity());
+        assertEquals(3, employeeService.count());
     }
 
     @Test
@@ -181,7 +182,8 @@ public class EmployeeControllerIntegrationTest {
         Employee employee = employeeService.findById(2);
 
         employee.setLastName(null);
-        employeeService.update(employee, status().isUnprocessableEntity());
+        employeeService.update(id, employee, status().isUnprocessableEntity());
+        assertEquals(3, employeeService.count());
     }
 
     @Test
@@ -269,9 +271,9 @@ public class EmployeeControllerIntegrationTest {
             return servletResponse;
         }
 
-        public void update(Employee employee, ResultMatcher expectedStatus) throws Exception {
+        public void update(Integer id, Employee employee, ResultMatcher expectedStatus) throws Exception {
             String json = objectMapper.writeValueAsString(employee);
-            MockHttpServletResponse servletResponse = getHttpServletResponseWithEmptyBody(json, expectedStatus);
+            MockHttpServletResponse servletResponse = executePutMethod(id, json, expectedStatus);
             assertNotNull(servletResponse);
         }
 
