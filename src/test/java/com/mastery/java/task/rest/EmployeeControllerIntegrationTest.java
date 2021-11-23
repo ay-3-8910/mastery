@@ -72,7 +72,7 @@ public class EmployeeControllerIntegrationTest {
         assertEquals(2, employee.getDepartmentId());
         assertEquals("bottles washer", employee.getJobTitle());
         assertEquals(Gender.UNSPECIFIED, employee.getGender());
-        assertEquals(LocalDate.of(2018, 8, 16), employee.getDateOfBirth());
+        assertEquals(LocalDate.of(2000, 8, 16), employee.getDateOfBirth());
     }
 
     @Test
