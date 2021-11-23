@@ -4,8 +4,10 @@ import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.service.EmployeeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -14,15 +16,15 @@ import java.util.List;
 /**
  * @author Sergey Tsynin
  */
-@RestController
+@Controller
 public class EmployeeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeController.class);
 
-    private final EmployeeService employeeService;
+    @Autowired
+    private EmployeeService employeeService;
 
     public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
         LOGGER.debug("Employees controller was created");
     }
 
