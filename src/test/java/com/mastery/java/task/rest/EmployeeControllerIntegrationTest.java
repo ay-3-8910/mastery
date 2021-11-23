@@ -150,20 +150,18 @@ public class EmployeeControllerIntegrationTest {
         employeeService.update(id, employee, status().isOk());
 
         assertEquals(3, employeeService.count());
-        assertEquals(newJobTitle,employeeService.findById(id).getJobTitle());
+        assertEquals(newJobTitle, employeeService.findById(id).getJobTitle());
     }
 
     @Test
-    public void shouldReturnNotFoundIfUpdateEmployeeWithUnknownId() throws Exception {
-        LOGGER.debug("shouldReturnNotFoundIfUpdateEmployeeWithUnknownId()");
-        Integer id = 2;
-        Integer newId = 99;
+    public void shouldCreateNewEmployeeIfUpdateEmployeeWithUnknownId() throws Exception {
+        LOGGER.debug("shouldCreateNewEmployeeIfUpdateEmployeeWithUnknownId()");
+        Integer id = 99;
+        Employee newEmployee = getFakeEmployee(id);
 
-        Employee employee = employeeService.findById(id);
-        employee.setEmployeeId(newId);
-        employeeService.update(employee, status().isNotFound());
+        employeeService.update(id, newEmployee, status().isCreated());
 
-        assertEquals(3, employeeService.count());
+        assertEquals(4, employeeService.count());
     }
 
     @Test
