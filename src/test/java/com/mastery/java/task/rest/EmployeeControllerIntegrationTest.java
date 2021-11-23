@@ -169,7 +169,8 @@ public class EmployeeControllerIntegrationTest {
     @Test
     public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullFirstName() throws Exception {
         LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullFirstName()");
-        Employee employee = employeeService.findById(2);
+        Integer id = 2;
+        Employee employee = employeeService.findById(id);
 
         employee.setFirstName(null);
         employeeService.update(id, employee, status().isUnprocessableEntity());
@@ -179,7 +180,8 @@ public class EmployeeControllerIntegrationTest {
     @Test
     public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullLastName() throws Exception {
         LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullLastName()");
-        Employee employee = employeeService.findById(2);
+        Integer id = 2;
+        Employee employee = employeeService.findById(id);
 
         employee.setLastName(null);
         employeeService.update(id, employee, status().isUnprocessableEntity());
