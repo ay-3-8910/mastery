@@ -187,6 +187,17 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
+    public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithLowAge() throws Exception {
+        LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithLowAge()");
+        Integer id = 2;
+        Employee employee = employeeService.findById(id);
+
+        employee.setDateOfBirth(LocalDate.now());
+        employeeService.update(id, employee, status().isUnprocessableEntity());
+        assertEquals(3, employeeService.count());
+    }
+
+    @Test
     public void shouldDeleteEmployee() throws Exception {
         LOGGER.debug("shouldDeleteEmployee()");
         employeeService.delete(2, status().isNoContent(), jsonPath("$").doesNotExist());
