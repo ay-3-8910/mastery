@@ -277,6 +277,17 @@ public class EmployeeControllerIntegrationTest {
             assertNotNull(servletResponse);
         }
 
+        private MockHttpServletResponse executePutMethod(Integer id, String json, ResultMatcher expectedStatus) throws Exception {
+            return mockMvc.perform(put(URI + "/" + id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+                    .accept(MediaType.APPLICATION_JSON)
+            ).andDo(print())
+                    .andExpect(expectedStatus)
+//                    .andExpect(jsonPath("$").doesNotExist())
+                    .andReturn().getResponse();
+        }
+
         public void deleteById(Integer id) throws Exception {
             MockHttpServletResponse servletResponse = mockMvc.perform(
                     MockMvcRequestBuilders.delete(URI + "/" + id))
