@@ -1,6 +1,7 @@
 package com.mastery.java.task.dao;
 
 import com.mastery.java.task.dto.Employee;
+import com.mastery.java.task.rest.excepton_handling.NotFoundEmployeeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,13 +72,20 @@ public class EmployeeDao {
         return employees;
     }
 
-    public Optional<Employee> findById(Integer id) {
+    public Employee findById(Integer id) {
         LOGGER.debug("Get employee id: {} from database", id);
         List<Employee> passengers = namedParameterJdbcTemplate.query(
                 sqlGetEmployeeById,
                 new MapSqlParameterSource("EMPLOYEE_ID", id),
                 rowMapper);
-        return Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
+        Optional<Employee> optionalEmployee = Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
+
+        if (optionalEmployee.isEmpty()) {
+            String errorMessage = "Employee id:" + id + " was not found in database";
+            LOGGER.error(errorMessage);
+            throw new NotFoundEmployeeException(errorMessage);
+        }
+        return optionalEmployee.get();
     }
 
     public Employee save(Employee employee) {
@@ -109,6 +117,14 @@ public class EmployeeDao {
                 sqlDeleteEmployeeById,
                 new MapSqlParameterSource("EMPLOYEE_ID", id));
         LOGGER.debug("Numbers of deleted employees: {}", numberOfDeletedEmployees);
+
+        if (numberOfDeletedEmployees == 0) {
+            LOGGER.error("Employee was not deleted because -");
+            String errorMessage = "Employee id:" + id + " was not found in database";
+            LOGGER.error(errorMessage);
+            throw new NotFoundEmployeeException(errorMessage);
+        }
+
         return numberOfDeletedEmployees > 0;
     }
 
@@ -121,7 +137,14 @@ public class EmployeeDao {
     }
 
     public boolean existsById(Integer id) {
-        return this.findById(id).isPresent();
+        List<Employee> passengers = namedParameterJdbcTemplate.query(
+                sqlGetEmployeeById,
+                new MapSqlParameterSource("EMPLOYEE_ID", id),
+                rowMapper);
+        Optional<Employee> optionalEmployee = Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
+        LOGGER.debug("Employee with id: {} is exists - {}", id, optionalEmployee.isPresent());
+
+        return optionalEmployee.isPresent();
     }
 
     private SqlParameterSource getParameterSource(Employee employee) {

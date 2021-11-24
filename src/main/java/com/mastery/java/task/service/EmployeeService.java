@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Sergey Tsynin
@@ -41,7 +40,7 @@ public class EmployeeService {
      * @param employeeId train Id.
      * @return employee.
      */
-    public Optional<Employee> getById(Integer employeeId) {
+    public Employee getById(Integer employeeId) {
         LOGGER.debug("Get employee id: {} from repository", employeeId);
         return employeeDao.findById(employeeId);
     }
@@ -50,28 +49,23 @@ public class EmployeeService {
      * Save new employee record.
      *
      * @param employee object.
-     * @return saved employee Id.
+     * @return saved employee.
      */
-    public Integer createEmployee(Employee employee) {
+    public Employee createEmployee(Employee employee) {
         LOGGER.debug("Save employee into repository");
-        return employeeDao.save(employee).getEmployeeId();
+        return employeeDao.save(employee);
     }
 
     /**
      * Update employee record in the database.
      *
      * @param employee object.
-     * @return has employee updated.
+     * @return updated employee.
      */
-    public Boolean updateEmployee(Employee employee) {
+    public Employee updateEmployee(Employee employee) {
         Integer id = employee.getEmployeeId();
         LOGGER.debug("Request to update employee id: {}", id);
-        if (employeeDao.existsById(id)) {
-            LOGGER.debug("updating employee");
-            return employee.equals(employeeDao.update(employee));
-        }
-        LOGGER.error("...but employee not found for update!");
-        return false;
+        return employeeDao.update(employee);
     }
 
     /**
@@ -82,12 +76,7 @@ public class EmployeeService {
      */
     public boolean deleteEmployee(Integer employeeId) {
         LOGGER.debug("Request to delete employee id: {}", employeeId);
-        if (employeeDao.existsById(employeeId)) {
-            LOGGER.debug("deleting employee");
-            return employeeDao.deleteById(employeeId);
-        }
-        LOGGER.error("...but employee not found for delete!");
-        return false;
+        return employeeDao.deleteById(employeeId);
     }
 
     /**
@@ -98,5 +87,15 @@ public class EmployeeService {
     public Integer getEmployeesCount() {
         LOGGER.debug("Get employees count");
         return Math.toIntExact(employeeDao.count());
+    }
+
+    /**
+     * Check if employee exists in the database.
+     *
+     * @param employeeId employee Id.
+     */
+    public boolean isEmployeeExists(Integer employeeId) {
+        LOGGER.debug("Check if employee exists");
+        return employeeDao.existsById(employeeId);
     }
 }

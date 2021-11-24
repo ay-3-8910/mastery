@@ -3,6 +3,7 @@ package com.mastery.java.task.dao;
 import com.mastery.java.task.config.AppConfiguration;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
+import com.mastery.java.task.rest.excepton_handling.NotFoundEmployeeException;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,6 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,23 +48,21 @@ class EmployeeDaoTest {
     @Test
     public void shouldReturnEmployee() {
         LOGGER.debug("shouldReturnEmployee()");
-        Optional<Employee> optionalEmployee = employeeDao.findById(2);
-        assertTrue(optionalEmployee.isPresent());
-        Employee employee = optionalEmployee.get();
+        Employee employee = employeeDao.findById(2);
         assertEquals(2, employee.getEmployeeId());
         assertEquals("Rudolph", employee.getFirstName());
         assertEquals("the Deer", employee.getLastName());
         assertEquals(2, employee.getDepartmentId());
         assertEquals("bottles washer", employee.getJobTitle());
         assertEquals(Gender.UNSPECIFIED, employee.getGender());
-        assertEquals(LocalDate.of(2018, 8, 16), employee.getDateOfBirth());
+        assertEquals(LocalDate.of(2000, 8, 16), employee.getDateOfBirth());
     }
 
     @Test
-    public void shouldReturnEmptyOptionalWithUnknownEmployeeId() {
-        LOGGER.debug("shouldReturnEmptyOptionalWithUnknownEmployeeId()");
-        Optional<Employee> optionalEmployee = employeeDao.findById(99);
-        assertFalse(optionalEmployee.isPresent());
+    public void shouldReturnExceptionWithUnknownEmployeeId() {
+        LOGGER.debug("shouldReturnExceptionWithUnknownEmployeeId()");
+        Exception exception = assertThrows(NotFoundEmployeeException.class, () -> employeeDao.findById(99));
+        assertEquals("Employee id:99 was not found in database", exception.getMessage());
     }
 
     @Test
@@ -82,7 +80,7 @@ class EmployeeDaoTest {
         Employee savedEmployee = employeeDao.save(newEmployee);
         assertEquals(4, savedEmployee.getEmployeeId());
         assertEquals(employeesCountBefore + 1, employeeDao.count());
-        assertEquals(newEmployee, employeeDao.findById(savedEmployee.getEmployeeId()).orElse(null));
+        assertEquals(newEmployee, employeeDao.findById(savedEmployee.getEmployeeId()));
     }
 
     @Test
@@ -91,16 +89,12 @@ class EmployeeDaoTest {
         Integer employeesCountBefore = employeeDao.count();
         String newJobTitle = "head of bottles washing";
         Integer employeeId = 2;
-        Optional<Employee> optionalEmployee = employeeDao.findById(employeeId);
-        assertTrue(optionalEmployee.isPresent());
 
-        Employee oldEmployee = optionalEmployee.get();
+        Employee oldEmployee = employeeDao.findById(employeeId);
         oldEmployee.setJobTitle(newJobTitle);
         employeeDao.update(oldEmployee);
         assertEquals(employeesCountBefore, employeeDao.count());
-        Optional<Employee> updatedEmployee = employeeDao.findById(employeeId);
-        assertTrue(updatedEmployee.isPresent());
-        assertEquals(newJobTitle, updatedEmployee.get().getJobTitle());
+        assertEquals(newJobTitle, employeeDao.findById(employeeId).getJobTitle());
     }
 
     @Test

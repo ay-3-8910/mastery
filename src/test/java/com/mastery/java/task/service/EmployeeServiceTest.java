@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -57,18 +56,17 @@ class EmployeeServiceTest {
 
         // given
         Employee fakeEmployee = getFakeEmployee(1);
-        when(employeeDao.findById(1)).thenReturn(Optional.of(fakeEmployee));
+        when(employeeDao.findById(1)).thenReturn(fakeEmployee);
 
         // when
-        Optional<Employee> employee = employeeService.getById(1);
+        Employee employee = employeeService.getById(1);
 
         //then
-        assertTrue(employee.isPresent());
-        assertEquals(fakeEmployee, employee.get());
+        assertEquals(fakeEmployee, employee);
     }
 
     @Test
-    void shouldReturnEmployeeIdWithCreate() {
+    void shouldReturnEmployeeWithCreateMethod() {
         LOGGER.debug("shouldReturnEmployeeIdWithCreate()");
 
         // given
@@ -76,41 +74,25 @@ class EmployeeServiceTest {
         when(employeeDao.save(fakeEmployee)).thenReturn(fakeEmployee);
 
         // when
-        Integer newFakeEmployeeId = employeeService.createEmployee(fakeEmployee);
+        Employee returnedEmployee = employeeService.createEmployee(fakeEmployee);
 
         //then
-        assertEquals(22, newFakeEmployeeId);
+        assertEquals(fakeEmployee, returnedEmployee);
     }
 
     @Test
-    void shouldReturnTrueWithUpdateEmployee() {
-        LOGGER.debug("shouldReturnTrueWithUpdateEmployee()");
-
-        // given
-        Employee fakeEmployee = getFakeEmployee(22);
-        when(employeeDao.update(fakeEmployee)).thenReturn(fakeEmployee);
-        when(employeeDao.existsById(22)).thenReturn(true);
-
-        // when
-        boolean isEmployeeUpdated = employeeService.updateEmployee(fakeEmployee);
-
-        //then
-        assertTrue(isEmployeeUpdated);
-    }
-
-    @Test
-    void shouldReturnFalseWithUpdateNonExistsEmployee() {
-        LOGGER.debug("shouldReturnFalseWithUpdateNonExistsEmployee()");
+    void shouldReturnEmployeeWithUpdateMethod() {
+        LOGGER.debug("shouldReturnEmployeeWithUpdateMethod()");
 
         // given
         Employee fakeEmployee = getFakeEmployee(33);
-        when(employeeDao.existsById(33)).thenReturn(false);
+        when(employeeDao.update(fakeEmployee)).thenReturn(fakeEmployee);
 
         // when
-        boolean isEmployeeUpdated = employeeService.updateEmployee(fakeEmployee);
+        Employee returnedEmployee = employeeService.updateEmployee(fakeEmployee);
 
         //then
-        assertFalse(isEmployeeUpdated);
+        assertEquals(fakeEmployee, returnedEmployee);
     }
 
     @Test
@@ -120,7 +102,6 @@ class EmployeeServiceTest {
         // given
         Integer fakeEmployeeId = 22;
         when(employeeDao.deleteById(fakeEmployeeId)).thenReturn(true);
-        when(employeeDao.existsById(fakeEmployeeId)).thenReturn(true);
 
         // when
         boolean isEmployeeDeleted = employeeService.deleteEmployee(fakeEmployeeId);
@@ -128,22 +109,6 @@ class EmployeeServiceTest {
         //then
         assertTrue(isEmployeeDeleted);
     }
-
-    @Test
-    void shouldReturnFalseWithDeleteNonExistsEmployee() {
-        LOGGER.debug("shouldReturnFalseWithUpdateNonExistsEmployee()");
-
-        // given
-        Integer fakeEmployeeId = 22;
-        when(employeeDao.existsById(fakeEmployeeId)).thenReturn(false);
-
-        // when
-        boolean isEmployeeDeleted = employeeService.deleteEmployee(fakeEmployeeId);
-
-        //then
-        assertFalse(isEmployeeDeleted);
-    }
-
 
     @Test
     void shouldReturnEmployeesCount() {

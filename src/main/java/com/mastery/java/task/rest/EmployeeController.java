@@ -4,26 +4,27 @@ import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.service.EmployeeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Sergey Tsynin
  */
-@RestController
+@Controller
 public class EmployeeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeController.class);
 
-    private final EmployeeService employeeService;
+    @Autowired
+    private EmployeeService employeeService;
 
     public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
         LOGGER.debug("Employees controller was created");
     }
 
@@ -49,29 +50,21 @@ public class EmployeeController {
     @GetMapping(value = "/employees/{id}", produces = {"application/json"})
     public final ResponseEntity<Employee> getById(@PathVariable Integer id) {
         LOGGER.debug("Employee id: {} request from service", id);
-        Optional<Employee> optionalEmployee = employeeService.getById(id);
-        if (optionalEmployee.isEmpty()) {
-            LOGGER.error("Employee not found for id: {}", id);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Employee employee = employeeService.getById(id);
         LOGGER.debug("Return employee id: {}", id);
-        return new ResponseEntity<>(optionalEmployee.get(), HttpStatus.OK);
+        return new ResponseEntity<>(employee, HttpStatus.OK);
     }
 
     /**
      * Create new employee record.
      *
      * @param employee object.
-     * @return saved employee Id.
+     * @return saved employee.
      */
     @PostMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
-    public final ResponseEntity<Integer> create(@Valid @RequestBody Employee employee) {
+    public final ResponseEntity<Employee> create(@Valid @RequestBody Employee employee) {
         LOGGER.debug("Request to create new employee");
-        if (employeeFieldsIsCorrect(employee, "Create")) {
-            return new ResponseEntity<>(employeeService.createEmployee(employee), HttpStatus.CREATED);
-        }
-        LOGGER.error("Return creating error");
-        return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<>(employeeService.createEmployee(employee), HttpStatus.CREATED);
     }
 
     /**
@@ -80,20 +73,22 @@ public class EmployeeController {
      * @param employee object.
      * @return equivalent HttpStatus and empty body.
      */
-    @PutMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
-    public final ResponseEntity<Void> update(@RequestBody Employee employee) {
-        Integer id = employee.getEmployeeId();
+    @PutMapping(value = "/employees/{id}", consumes = {"application/json"}, produces = {"application/json"})
+    public final ResponseEntity<Employee> update(@PathVariable Integer id, @Valid @RequestBody Employee employee) {
         LOGGER.debug("Request to update employee id: {} ", id);
-        if (!employeeFieldsIsCorrect(employee, "Update")) {
-            LOGGER.error("Return updating error");
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-        if (employeeService.updateEmployee(employee)) {
+        Employee returnedEmployee;
+
+        if (employeeService.isEmployeeExists(id)) {
+            LOGGER.debug("Execute update");
+            returnedEmployee = employeeService.updateEmployee(employee);
             LOGGER.debug("Return result - employee with id: {} updated", id);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(returnedEmployee, HttpStatus.OK);
         }
-        LOGGER.debug("Return result - employee with id: {} was not updated because it was not found", id);
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        LOGGER.debug("Redirect to create new employee");
+        LOGGER.warn("Id: {} was not found in database, creating new employee", id);
+        returnedEmployee = employeeService.createEmployee(employee);
+        LOGGER.debug("New employee was created with id: {}", returnedEmployee.getEmployeeId());
+        return new ResponseEntity<>(returnedEmployee, HttpStatus.CREATED);
     }
 
     /**
@@ -105,12 +100,9 @@ public class EmployeeController {
     @DeleteMapping(value = "/employees/{id}", produces = {"application/json"})
     public final ResponseEntity<Void> delete(@PathVariable Integer id) {
         LOGGER.debug("Request to delete employee id: {} ", id);
-        if (employeeService.deleteEmployee(id)) {
-            LOGGER.debug("Return result - employee with id: {} deleted", id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        LOGGER.debug("Return result - employee with id: {} was not deleted because it was not found", id);
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        employeeService.deleteEmployee(id);
+        LOGGER.debug("Return result - employee with id: {} deleted", id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -122,19 +114,5 @@ public class EmployeeController {
     public final ResponseEntity<Integer> count() {
         LOGGER.debug("Request to get count of employees");
         return new ResponseEntity<>(employeeService.getEmployeesCount(), HttpStatus.OK);
-    }
-
-    private boolean employeeFieldsIsCorrect(Employee employee, String stage) {
-        LOGGER.debug("Checking fields for correctness");
-        if (employee.getFirstName() == null) {
-            LOGGER.error(stage + " fail. Employee firstname is null");
-            return false;
-        }
-        if (employee.getLastName() == null) {
-            LOGGER.error(stage + " fail. Employee lastname is null");
-            return false;
-        }
-        LOGGER.debug("Fields are ok");
-        return true;
     }
 }

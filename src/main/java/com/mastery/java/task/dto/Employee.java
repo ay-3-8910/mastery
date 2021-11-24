@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -16,8 +17,10 @@ public class Employee {
 
     private Integer employeeId;
 
+    @NotNull(message = "Employee firstname cannot be empty")
     private String firstName;
 
+    @NotNull(message = "Employee lastname cannot be empty")
     private String lastName;
 
     private Integer departmentId;
@@ -28,7 +31,7 @@ public class Employee {
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
-    @EmployeeAgeConstraint(message = "the employee must be over 18 years old")
+    @EmployeeAgeConstraint(message = "The employee must be over 18 years old")
     private LocalDate dateOfBirth;
 
     /**

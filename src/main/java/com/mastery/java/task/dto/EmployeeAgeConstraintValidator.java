@@ -11,6 +11,6 @@ public class EmployeeAgeConstraintValidator implements ConstraintValidator<Emplo
 
     @Override
     public boolean isValid(LocalDate employeeBirthday, ConstraintValidatorContext constraintValidatorContext) {
-        return employeeBirthday.isBefore(LocalDate.now().minusYears(18));
+        return employeeBirthday.isBefore(LocalDate.now().minusYears(18).plusDays(1));
     }
 }
