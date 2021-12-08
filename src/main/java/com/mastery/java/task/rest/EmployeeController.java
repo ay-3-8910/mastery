@@ -17,6 +17,7 @@ import java.util.List;
  * @author Sergey Tsynin
  */
 @Controller
+@RequestMapping("employees")
 public class EmployeeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeController.class);
@@ -33,7 +34,7 @@ public class EmployeeController {
      *
      * @return Employees list.
      */
-    @GetMapping(value = "/employees", produces = {"application/json"})
+    @GetMapping(value = "", produces = {"application/json"})
     public final ResponseEntity<List<Employee>> getAll() {
         LOGGER.debug("Employees list request from service");
         return new ResponseEntity<>(
@@ -47,7 +48,7 @@ public class EmployeeController {
      * @param id employee Id.
      * @return employee.
      */
-    @GetMapping(value = "/employees/{id}", produces = {"application/json"})
+    @GetMapping(value = "/{id}", produces = {"application/json"})
     public final ResponseEntity<Employee> getById(@PathVariable Integer id) {
         LOGGER.debug("Employee id: {} request from service", id);
         Employee employee = employeeService.getById(id);
@@ -61,7 +62,7 @@ public class EmployeeController {
      * @param employee object.
      * @return saved employee.
      */
-    @PostMapping(value = "/employees", consumes = {"application/json"}, produces = {"application/json"})
+    @PostMapping(value = "", consumes = {"application/json"}, produces = {"application/json"})
     public final ResponseEntity<Employee> create(@Valid @RequestBody Employee employee) {
         LOGGER.debug("Request to create new employee");
         return new ResponseEntity<>(employeeService.createEmployee(employee), HttpStatus.CREATED);
@@ -73,7 +74,7 @@ public class EmployeeController {
      * @param employee object.
      * @return equivalent HttpStatus and empty body.
      */
-    @PutMapping(value = "/employees/{id}", consumes = {"application/json"}, produces = {"application/json"})
+    @PutMapping(value = "/{id}", consumes = {"application/json"}, produces = {"application/json"})
     public final ResponseEntity<Employee> update(@PathVariable Integer id, @Valid @RequestBody Employee employee) {
         LOGGER.debug("Request to update employee id: {} ", id);
         Employee returnedEmployee;
@@ -97,7 +98,7 @@ public class EmployeeController {
      * @param id employee Id.
      * @return equivalent HttpStatus and empty body.
      */
-    @DeleteMapping(value = "/employees/{id}", produces = {"application/json"})
+    @DeleteMapping(value = "/{id}", produces = {"application/json"})
     public final ResponseEntity<Void> delete(@PathVariable Integer id) {
         LOGGER.debug("Request to delete employee id: {} ", id);
         employeeService.deleteEmployee(id);
@@ -110,7 +111,7 @@ public class EmployeeController {
      *
      * @return the number of employees in the database.
      */
-    @GetMapping(value = "/employees/count", produces = {"application/json"})
+    @GetMapping(value = "/count", produces = {"application/json"})
     public final ResponseEntity<Integer> count() {
         LOGGER.debug("Request to get count of employees");
         return new ResponseEntity<>(employeeService.getEmployeesCount(), HttpStatus.OK);
