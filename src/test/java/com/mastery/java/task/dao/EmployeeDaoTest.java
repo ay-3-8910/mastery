@@ -3,7 +3,7 @@ package com.mastery.java.task.dao;
 import com.mastery.java.task.config.AppConfiguration;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
-import com.mastery.java.task.rest.excepton_handling.NotFoundEmployeeException;
+import com.mastery.java.task.rest.excepton_handling.NotFoundMasteryException;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ class EmployeeDaoTest {
     @Test
     public void shouldReturnExceptionWithUnknownEmployeeId() {
         LOGGER.debug("shouldReturnExceptionWithUnknownEmployeeId()");
-        Exception exception = assertThrows(NotFoundEmployeeException.class, () -> employeeDao.findById(99));
+        Exception exception = assertThrows(NotFoundMasteryException.class, () -> employeeDao.findById(99));
         assertEquals("Employee id:99 was not found in database", exception.getMessage());
     }
 

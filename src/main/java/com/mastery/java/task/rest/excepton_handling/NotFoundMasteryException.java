@@ -3,9 +3,9 @@ package com.mastery.java.task.rest.excepton_handling;
 /**
  * @author Sergey Tsynin
  */
-public class NotFoundEmployeeException extends RuntimeException {
+public class NotFoundMasteryException extends RuntimeException {
 
-    public NotFoundEmployeeException(String message) {
+    public NotFoundMasteryException(String message) {
         super(message);
     }
 }
