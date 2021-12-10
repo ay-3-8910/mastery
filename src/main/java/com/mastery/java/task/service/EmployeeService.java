@@ -2,8 +2,6 @@ package com.mastery.java.task.service;
 
 import com.mastery.java.task.dao.EmployeeDao;
 import com.mastery.java.task.dto.Employee;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -20,19 +18,12 @@ public class EmployeeService {
     @Autowired
     private EmployeeDao employeeDao;
 
-    public EmployeeService() {
-        LOGGER.debug("Employees service was created");
-    }
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeService.class);
-
     /**
      * Employees list.
      *
      * @return Employees list.
      */
     public List<Employee> getAllEmployees() {
-        LOGGER.debug("Employees list request from repository");
         return employeeDao.getAllEmployees();
     }
 
@@ -43,7 +34,6 @@ public class EmployeeService {
      * @return employee.
      */
     public Employee getEmployeeById(Integer employeeId) {
-        LOGGER.debug("Get employee id: {} from repository", employeeId);
         return employeeDao.getEmployeeById(employeeId);
     }
 
@@ -54,7 +44,6 @@ public class EmployeeService {
      * @return saved employee.
      */
     public Employee createEmployee(Employee employee) {
-        LOGGER.debug("Save employee into repository");
         return employeeDao.createEmployee(employee);
     }
 
@@ -66,7 +55,6 @@ public class EmployeeService {
      */
     public Employee updateEmployee(Employee employee) {
         Integer id = employee.getEmployeeId();
-        LOGGER.debug("Request to update employee id: {}", id);
         return employeeDao.updateEmployee(employee);
     }
 
@@ -77,7 +65,6 @@ public class EmployeeService {
      * @return has employee deleted.
      */
     public boolean deleteEmployee(Integer employeeId) {
-        LOGGER.debug("Request to delete employee id: {}", employeeId);
         return employeeDao.deleteEmployee(employeeId);
     }
 
@@ -87,7 +74,6 @@ public class EmployeeService {
      * @return the number of employees in the database.
      */
     public Integer getEmployeesCount() {
-        LOGGER.debug("Get employees count");
         return Math.toIntExact(employeeDao.getEmployeesCount());
     }
 }

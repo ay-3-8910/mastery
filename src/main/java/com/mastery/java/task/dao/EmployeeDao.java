@@ -64,16 +64,12 @@ public class EmployeeDao {
     }
 
     public List<Employee> getAllEmployees() {
-        LOGGER.debug("Employees list request from database");
-        List<Employee> employees = namedParameterJdbcTemplate.query(
+        return namedParameterJdbcTemplate.query(
                 sqlGetAllEmployee,
                 rowMapper);
-        LOGGER.debug("... found {} employee(s)", employees.size());
-        return employees;
     }
 
     public Employee getEmployeeById(Integer id) {
-        LOGGER.debug("Get employee id: {} from database", id);
         List<Employee> passengers = namedParameterJdbcTemplate.query(
                 sqlGetEmployeeById,
                 new MapSqlParameterSource("EMPLOYEE_ID", id),
@@ -81,15 +77,12 @@ public class EmployeeDao {
         Optional<Employee> optionalEmployee = Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
 
         if (optionalEmployee.isEmpty()) {
-            String errorMessage = "Employee id:" + id + " was not found in database";
-            LOGGER.error(errorMessage);
-            throw new NotFoundMasteryException(errorMessage);
+            throw new NotFoundMasteryException("Employee id: " + id + " was not found in database");
         }
         return optionalEmployee.get();
     }
 
     public Employee createEmployee(Employee employee) {
-        LOGGER.debug("Save employee into database");
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         namedParameterJdbcTemplate.update(
@@ -98,13 +91,10 @@ public class EmployeeDao {
                 keyHolder, new String[]{"employee_id"});
         Integer newEmployeeId = Objects.requireNonNull(keyHolder.getKey()).intValue();
         employee.setEmployeeId(newEmployeeId);
-        LOGGER.debug("New employee was created with id: {}", newEmployeeId);
-        LOGGER.debug("{}", employee);
         return employee;
     }
 
     public Employee updateEmployee(Employee employee) {
-        LOGGER.debug("Update employee in database");
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         namedParameterJdbcTemplate.update(
@@ -112,9 +102,7 @@ public class EmployeeDao {
                 getParameterSource(employee),
                 keyHolder, new String[]{"employee_id"});
         if (keyHolder.getKey() == null) {
-            String errorMessage = "Employee was not found in database";
-            LOGGER.error(errorMessage);
-            throw new NotFoundMasteryException(errorMessage);
+            throw new NotFoundMasteryException("Employee was not found in database");
         }
         return employee;
     }
@@ -124,20 +112,15 @@ public class EmployeeDao {
         int numberOfDeletedEmployees = namedParameterJdbcTemplate.update(
                 sqlDeleteEmployeeById,
                 new MapSqlParameterSource("EMPLOYEE_ID", id));
-        LOGGER.debug("Numbers of deleted employees: {}", numberOfDeletedEmployees);
 
         if (numberOfDeletedEmployees == 0) {
-            LOGGER.error("Employee was not deleted because -");
-            String errorMessage = "Employee id:" + id + " was not found in database";
-            LOGGER.error(errorMessage);
-            throw new NotFoundMasteryException(errorMessage);
+            throw new NotFoundMasteryException("Employee id: " + id + " was not found in database");
         }
 
         return numberOfDeletedEmployees > 0;
     }
 
     public Integer getEmployeesCount() {
-        LOGGER.debug("Get employees count from database");
         return namedParameterJdbcTemplate.queryForObject(
                 sqlGetEmployeesCount,
                 new HashMap<>(),
