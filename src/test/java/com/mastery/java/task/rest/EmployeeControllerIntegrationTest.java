@@ -82,7 +82,7 @@ public class EmployeeControllerIntegrationTest {
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.read(999, status().isNotFound()));
 
         assertNotNull(errorMessage);
-        assertEquals("Employee id:999 was not found in database", errorMessage.getInfo());
+        assertEquals("Employee id: 999 was not found in database", errorMessage.getInfo());
     }
 
     @Test
@@ -145,15 +145,12 @@ public class EmployeeControllerIntegrationTest {
     public void shouldUpdateEmployee() throws Exception {
         LOGGER.debug("shouldUpdateEmployee()");
         Integer id = 2;
-        String newJobTitle = "head of bottles washing";
+        Employee employee = getFakeEmployee(id);
 
-        Employee employee = employeeService.findById(id);
-        employee.setJobTitle(newJobTitle);
-        String returnedJobTitle = extractEmployee(employeeService.update(id, employee, status().isOk())).getJobTitle();
+        extractEmployee(employeeService.update(id, employee, status().isOk()));
 
         assertEquals(3, employeeService.count());
-        assertEquals(newJobTitle, returnedJobTitle);
-        assertEquals(newJobTitle, employeeService.findById(id).getJobTitle());
+        assertEquals(employee, employeeService.findById(id));
     }
 
     @Test
@@ -238,7 +235,7 @@ public class EmployeeControllerIntegrationTest {
                 content().contentType("application/json")));
 
         assertNotNull(errorMessage);
-        assertEquals("Employee id:999 was not found in database", errorMessage.getInfo());
+        assertEquals("Employee id: 999 was not found in database", errorMessage.getInfo());
 
         assertEquals(3, employeeService.count());
     }

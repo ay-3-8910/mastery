@@ -108,7 +108,6 @@ public class EmployeeDao {
     }
 
     public void deleteEmployee(Integer id) {
-        LOGGER.debug("Request to delete employee id: {}", id);
         int numberOfDeletedEmployees = namedParameterJdbcTemplate.update(
                 sqlDeleteEmployeeById,
                 new MapSqlParameterSource("EMPLOYEE_ID", id));

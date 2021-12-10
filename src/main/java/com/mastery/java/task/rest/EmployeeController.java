@@ -37,7 +37,6 @@ public class EmployeeController {
      */
     @GetMapping(value = "", produces = {"application/json"})
     public List<Employee> getAllEmployees() {
-        LOGGER.debug("Employees list request from service");
         return employeeService.getAllEmployees();
     }
 
@@ -49,10 +48,7 @@ public class EmployeeController {
      */
     @GetMapping(value = "/{id}", produces = {"application/json"})
     public Employee getEmployeeById(@PathVariable @Min(1) Integer id) {
-        LOGGER.debug("Employee id: {} request from service", id);
-        Employee employee = employeeService.getEmployeeById(id);
-        LOGGER.debug("Return employee id: {}", id); //todo return employee
-        return employee;
+        return employeeService.getEmployeeById(id);
     }
 
     /**
@@ -64,7 +60,6 @@ public class EmployeeController {
     @PostMapping(value = "", consumes = {"application/json"}, produces = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
     public Employee createEmployee(@Valid @RequestBody Employee employee) {
-        LOGGER.debug("Request to create new employee");
         return employeeService.createEmployee(employee);
     }
 
@@ -76,10 +71,7 @@ public class EmployeeController {
      */
     @PutMapping(value = "/{id}", consumes = {"application/json"}, produces = {"application/json"})
     public Employee updateEmployee(@PathVariable Integer id, @Valid @RequestBody Employee employee) {
-        LOGGER.debug("Request to update employee id: {} ", id);
-        Employee updatedEmployee = employeeService.updateEmployee(employee);
-        LOGGER.debug("Return result - employee with id: {} updated", id);
-        return updatedEmployee;
+        return employeeService.updateEmployee(employee);
     }
 
     /**
@@ -90,9 +82,7 @@ public class EmployeeController {
     @DeleteMapping(value = "/{id}", produces = {"application/json"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEmployee(@PathVariable Integer id) {
-        LOGGER.debug("Request to delete employee id: {} ", id);
         employeeService.deleteEmployee(id);
-        LOGGER.debug("Return result - employee with id: {} deleted", id);
     }
 
     /**
@@ -102,7 +92,6 @@ public class EmployeeController {
      */
     @GetMapping(value = "/count", produces = {"application/json"})
     public Integer getEmployeesCount() {
-        LOGGER.debug("Request to get count of employees");
         return employeeService.getEmployeesCount();
     }
 }
