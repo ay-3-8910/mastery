@@ -43,6 +43,6 @@ public class CustomExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public EmployeeErrorMessage handleUnknownExceptions(Exception exception) {
         LOGGER.error(exception.getMessage());
-        return new EmployeeErrorMessage("Ups! happened unknown error.");
+        return new EmployeeErrorMessage("Wow! Happened unknown error!");
     }
 }
