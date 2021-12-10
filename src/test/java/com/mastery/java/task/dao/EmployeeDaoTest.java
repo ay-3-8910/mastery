@@ -113,18 +113,6 @@ class EmployeeDaoTest {
         assertEquals(employeesCountBefore - 1, employeeDao.getEmployeesCount());
     }
 
-    @Test
-    public void shouldReturnTrueWithExistedEmployee() {
-        LOGGER.debug("shouldReturnTrueWithExistedEmployee()");
-        assertTrue(employeeDao.existsById(2));
-    }
-
-    @Test
-    public void shouldReturnFalseWithNonExistedEmployee() {
-        LOGGER.debug("shouldReturnTrueWithExistedEmployee()");
-        assertFalse(employeeDao.existsById(9));
-    }
-
     private Employee getFakeEmployee(@SuppressWarnings("SameParameterValue") Integer id) {
         Employee employee = new Employee();
         employee.setEmployeeId(id);
