@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
 import com.mastery.java.task.rest.excepton_handling.EmployeeErrorMessage;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,15 +158,18 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldCreateNewEmployeeIfUpdateEmployeeWithUnknownId() throws Exception {
-        LOGGER.debug("shouldCreateNewEmployeeIfUpdateEmployeeWithUnknownId()");
+    public void shouldReturn404IfUpdateEmployeeWithUnknownId() throws Exception {
+        LOGGER.debug("shouldReturn404IfUpdateEmployeeWithUnknownId()");
         Integer id = 99;
-        Employee newEmployee = getFakeEmployee(id);
+        Employee employee = getFakeEmployee(id);
 
-        Employee employee = extractEmployee(employeeService.update(id, newEmployee, status().isCreated()));
+        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
+                id,
+                employee,
+                status().isNotFound()));
 
-        assertEquals(4, employeeService.count());
-        assertEquals(4, employee.getEmployeeId());
+        assertEquals(3, employeeService.count());
+        assertEquals("Employee was not found in database", errorMessage.getInfo());
     }
 
     @Test
