@@ -6,14 +6,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 /**
  * @author Sergey Tsynin
  */
+@Validated
 @RestController
 @RequestMapping("employees")
 public class EmployeeController {
@@ -33,7 +36,7 @@ public class EmployeeController {
      * @return Employees list.
      */
     @GetMapping(value = "", produces = {"application/json"})
-    public final List<Employee> getAll() {
+    public List<Employee> getAll() {
         LOGGER.debug("Employees list request from service");
         return employeeService.findAll();
     }
@@ -45,7 +48,7 @@ public class EmployeeController {
      * @return employee.
      */
     @GetMapping(value = "/{id}", produces = {"application/json"})
-    public final Employee getById(@PathVariable Integer id) {
+    public Employee getById(@PathVariable @Min(1) Integer id) {
         LOGGER.debug("Employee id: {} request from service", id);
         Employee employee = employeeService.getById(id);
         LOGGER.debug("Return employee id: {}", id); //todo return employee
@@ -60,7 +63,7 @@ public class EmployeeController {
      */
     @PostMapping(value = "", consumes = {"application/json"}, produces = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
-    public final Employee create(@Valid @RequestBody Employee employee) {
+    public Employee create(@Valid @RequestBody Employee employee) {
         LOGGER.debug("Request to create new employee");
         return employeeService.createEmployee(employee);
     }
@@ -72,7 +75,7 @@ public class EmployeeController {
      * @return updated employee.
      */
     @PutMapping(value = "/{id}", consumes = {"application/json"}, produces = {"application/json"})
-    public final Employee update(@PathVariable Integer id, @Valid @RequestBody Employee employee) {
+    public Employee update(@PathVariable Integer id, @Valid @RequestBody Employee employee) {
         LOGGER.debug("Request to update employee id: {} ", id);
         Employee updatedEmployee = employeeService.updateEmployee(employee);
         LOGGER.debug("Return result - employee with id: {} updated", id);
@@ -86,7 +89,7 @@ public class EmployeeController {
      */
     @DeleteMapping(value = "/{id}", produces = {"application/json"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public final void delete(@PathVariable Integer id) {
+    public void delete(@PathVariable Integer id) {
         LOGGER.debug("Request to delete employee id: {} ", id);
         employeeService.deleteEmployee(id);
         LOGGER.debug("Return result - employee with id: {} deleted", id);
@@ -98,7 +101,7 @@ public class EmployeeController {
      * @return the number of employees in the database.
      */
     @GetMapping(value = "/count", produces = {"application/json"})
-    public final Integer count() {
+    public Integer count() {
         LOGGER.debug("Request to get count of employees");
         return employeeService.getEmployeesCount();
     }

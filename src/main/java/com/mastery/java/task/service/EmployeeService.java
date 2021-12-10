@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.Min;
 import java.util.List;
 
 /**
@@ -43,7 +42,7 @@ public class EmployeeService {
      * @param employeeId train Id.
      * @return employee.
      */
-    public Employee getById(@Min(1) Integer employeeId) {
+    public Employee getById(Integer employeeId) {
         LOGGER.debug("Get employee id: {} from repository", employeeId);
         return employeeDao.findById(employeeId);
     }
