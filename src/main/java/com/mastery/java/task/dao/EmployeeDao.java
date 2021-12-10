@@ -105,9 +105,17 @@ public class EmployeeDao {
 
     public Employee update(Employee employee) {
         LOGGER.debug("Update employee in database");
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
         namedParameterJdbcTemplate.update(
                 sqlUpdateEmployee,
-                getParameterSource(employee));
+                getParameterSource(employee),
+                keyHolder, new String[]{"employee_id"});
+        if (keyHolder.getKey() == null) {
+            String errorMessage = "Employee was not found in database";
+            LOGGER.error(errorMessage);
+            throw new NotFoundMasteryException(errorMessage);
+        }
         return employee;
     }
 

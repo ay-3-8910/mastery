@@ -98,6 +98,14 @@ class EmployeeDaoTest {
     }
 
     @Test
+    public void shouldReturnExceptionIfUpdateEmployeeWithUnknownId() {
+        LOGGER.debug("shouldReturnExceptionIfUpdateEmployeeWithUnknownId()");
+        Employee fakeEmployee = getFakeEmployee(128);
+        Exception exception = assertThrows(NotFoundMasteryException.class, () -> employeeDao.update(fakeEmployee));
+        assertEquals("Employee was not found in database", exception.getMessage());
+    }
+
+    @Test
     public void shouldDeleteEmployee() {
         LOGGER.debug("shouldDeleteEmployee()");
         Integer employeesCountBefore = employeeDao.count();
