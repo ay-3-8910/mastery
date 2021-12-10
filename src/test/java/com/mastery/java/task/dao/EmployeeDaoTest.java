@@ -40,7 +40,7 @@ class EmployeeDaoTest {
     @Test
     public void shouldReturnEmployeesList() {
         LOGGER.debug("shouldReturnEmployeesList()");
-        List<Employee> employees = employeeDao.findAll();
+        List<Employee> employees = employeeDao.getAllEmployees();
         assertNotNull(employees);
         assertEquals(3, employees.size());
     }
@@ -48,7 +48,7 @@ class EmployeeDaoTest {
     @Test
     public void shouldReturnEmployee() {
         LOGGER.debug("shouldReturnEmployee()");
-        Employee employee = employeeDao.findById(2);
+        Employee employee = employeeDao.getEmployeeById(2);
         assertEquals(2, employee.getEmployeeId());
         assertEquals("Rudolph", employee.getFirstName());
         assertEquals("the Deer", employee.getLastName());
@@ -61,56 +61,56 @@ class EmployeeDaoTest {
     @Test
     public void shouldReturnExceptionWithUnknownEmployeeId() {
         LOGGER.debug("shouldReturnExceptionWithUnknownEmployeeId()");
-        Exception exception = assertThrows(NotFoundMasteryException.class, () -> employeeDao.findById(99));
+        Exception exception = assertThrows(NotFoundMasteryException.class, () -> employeeDao.getEmployeeById(99));
         assertEquals("Employee id:99 was not found in database", exception.getMessage());
     }
 
     @Test
     public void shouldReturnCountOfEmployees() {
         LOGGER.debug("shouldReturnCountOfEmployees()");
-        Integer actualCount = employeeDao.findAll().size();
-        assertEquals(actualCount, employeeDao.count());
+        Integer actualCount = employeeDao.getAllEmployees().size();
+        assertEquals(actualCount, employeeDao.getEmployeesCount());
     }
 
     @Test
     public void shouldSaveNewEmployee() {
         LOGGER.debug("shouldSaveNewEmployee()");
-        Integer employeesCountBefore = employeeDao.count();
+        Integer employeesCountBefore = employeeDao.getEmployeesCount();
         Employee newEmployee = getFakeEmployee(128);
-        Employee savedEmployee = employeeDao.save(newEmployee);
+        Employee savedEmployee = employeeDao.createEmployee(newEmployee);
         assertEquals(4, savedEmployee.getEmployeeId());
-        assertEquals(employeesCountBefore + 1, employeeDao.count());
-        assertEquals(newEmployee, employeeDao.findById(savedEmployee.getEmployeeId()));
+        assertEquals(employeesCountBefore + 1, employeeDao.getEmployeesCount());
+        assertEquals(newEmployee, employeeDao.getEmployeeById(savedEmployee.getEmployeeId()));
     }
 
     @Test
     public void shouldUpdateEmployee() {
         LOGGER.debug("shouldUpdateEmployee()");
-        Integer employeesCountBefore = employeeDao.count();
+        Integer employeesCountBefore = employeeDao.getEmployeesCount();
         String newJobTitle = "head of bottles washing";
         Integer employeeId = 2;
 
-        Employee oldEmployee = employeeDao.findById(employeeId);
+        Employee oldEmployee = employeeDao.getEmployeeById(employeeId);
         oldEmployee.setJobTitle(newJobTitle);
-        employeeDao.update(oldEmployee);
-        assertEquals(employeesCountBefore, employeeDao.count());
-        assertEquals(newJobTitle, employeeDao.findById(employeeId).getJobTitle());
+        employeeDao.updateEmployee(oldEmployee);
+        assertEquals(employeesCountBefore, employeeDao.getEmployeesCount());
+        assertEquals(newJobTitle, employeeDao.getEmployeeById(employeeId).getJobTitle());
     }
 
     @Test
     public void shouldReturnExceptionIfUpdateEmployeeWithUnknownId() {
         LOGGER.debug("shouldReturnExceptionIfUpdateEmployeeWithUnknownId()");
         Employee fakeEmployee = getFakeEmployee(128);
-        Exception exception = assertThrows(NotFoundMasteryException.class, () -> employeeDao.update(fakeEmployee));
+        Exception exception = assertThrows(NotFoundMasteryException.class, () -> employeeDao.updateEmployee(fakeEmployee));
         assertEquals("Employee was not found in database", exception.getMessage());
     }
 
     @Test
     public void shouldDeleteEmployee() {
         LOGGER.debug("shouldDeleteEmployee()");
-        Integer employeesCountBefore = employeeDao.count();
-        assertTrue(employeeDao.deleteById(2));
-        assertEquals(employeesCountBefore - 1, employeeDao.count());
+        Integer employeesCountBefore = employeeDao.getEmployeesCount();
+        assertTrue(employeeDao.deleteEmployee(2));
+        assertEquals(employeesCountBefore - 1, employeeDao.getEmployeesCount());
     }
 
     @Test

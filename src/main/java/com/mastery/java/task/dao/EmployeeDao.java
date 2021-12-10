@@ -63,7 +63,7 @@ public class EmployeeDao {
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
-    public List<Employee> findAll() {
+    public List<Employee> getAllEmployees() {
         LOGGER.debug("Employees list request from database");
         List<Employee> employees = namedParameterJdbcTemplate.query(
                 sqlGetAllEmployee,
@@ -72,7 +72,7 @@ public class EmployeeDao {
         return employees;
     }
 
-    public Employee findById(Integer id) {
+    public Employee getEmployeeById(Integer id) {
         LOGGER.debug("Get employee id: {} from database", id);
         List<Employee> passengers = namedParameterJdbcTemplate.query(
                 sqlGetEmployeeById,
@@ -88,7 +88,7 @@ public class EmployeeDao {
         return optionalEmployee.get();
     }
 
-    public Employee save(Employee employee) {
+    public Employee createEmployee(Employee employee) {
         LOGGER.debug("Save employee into database");
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -103,7 +103,7 @@ public class EmployeeDao {
         return employee;
     }
 
-    public Employee update(Employee employee) {
+    public Employee updateEmployee(Employee employee) {
         LOGGER.debug("Update employee in database");
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -119,7 +119,7 @@ public class EmployeeDao {
         return employee;
     }
 
-    public boolean deleteById(Integer id) {
+    public boolean deleteEmployee(Integer id) {
         LOGGER.debug("Request to delete employee id: {}", id);
         int numberOfDeletedEmployees = namedParameterJdbcTemplate.update(
                 sqlDeleteEmployeeById,
@@ -136,7 +136,7 @@ public class EmployeeDao {
         return numberOfDeletedEmployees > 0;
     }
 
-    public Integer count() {
+    public Integer getEmployeesCount() {
         LOGGER.debug("Get employees count from database");
         return namedParameterJdbcTemplate.queryForObject(
                 sqlGetEmployeesCount,
