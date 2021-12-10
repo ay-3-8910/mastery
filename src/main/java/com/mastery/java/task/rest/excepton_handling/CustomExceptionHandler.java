@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
+
 /**
  * @author Sergey Tsynin
  */
@@ -28,6 +30,13 @@ public class CustomExceptionHandler {
     public EmployeeErrorMessage handleValidationsErrors(MethodArgumentNotValidException exception) {
         LOGGER.error(exception.getMessage());
         return new EmployeeErrorMessage(exception.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public EmployeeErrorMessage handleConstraintViolationException(ConstraintViolationException exception) {
+        LOGGER.error(exception.getMessage());
+        return new EmployeeErrorMessage("Validation error.");
     }
 
     @ExceptionHandler

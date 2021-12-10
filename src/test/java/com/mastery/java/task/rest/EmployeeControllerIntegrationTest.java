@@ -253,6 +253,18 @@ public class EmployeeControllerIntegrationTest {
         assertEquals(3, employeesCount);
     }
 
+    @Test
+    public void shouldReturn400InCaseInvalidIdWithGetMethod() throws Exception {
+        LOGGER.debug("shouldReturn400InCaseInvalidIdWithGetMethod()");
+
+        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.read(
+                0,
+                status().isBadRequest()));
+
+        assertNotNull(errorMessage);
+        assertEquals("Validation error.", errorMessage.getInfo());
+    }
+
     private Employee getFakeEmployee(Integer id) {
         Employee employee = new Employee();
         employee.setEmployeeId(id);

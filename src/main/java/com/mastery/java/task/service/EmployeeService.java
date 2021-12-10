@@ -6,13 +6,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Min;
 import java.util.List;
 
 /**
  * @author Sergey Tsynin
  */
 @Service
+@Validated
 public class EmployeeService {
 
     @Autowired
@@ -40,7 +43,7 @@ public class EmployeeService {
      * @param employeeId train Id.
      * @return employee.
      */
-    public Employee getById(Integer employeeId) {
+    public Employee getById(@Min(1) Integer employeeId) {
         LOGGER.debug("Get employee id: {} from repository", employeeId);
         return employeeDao.findById(employeeId);
     }
