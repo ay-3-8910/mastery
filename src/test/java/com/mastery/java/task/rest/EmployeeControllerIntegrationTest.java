@@ -77,8 +77,8 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnNotFoundWithTryToFindUnknownId() throws Exception {
-        LOGGER.debug("shouldReturnNotFoundWithTryToFindUnknownId()");
+    public void shouldReturn404WithTryToFindUnknownId() throws Exception {
+        LOGGER.debug("shouldReturn404WithTryToFindUnknownId()");
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.read(999, status().isNotFound()));
 
         assertNotNull(errorMessage);
@@ -101,8 +101,8 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfCreateTooYoungEmployee() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfCreateTooYoungEmployee()");
+    public void shouldReturn400IfCreateTooYoungEmployee() throws Exception {
+        LOGGER.debug("shouldReturn400IfCreateTooYoungEmployee()");
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setDateOfBirth(LocalDate.now());
 
@@ -115,8 +115,8 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfCreateEmployeeWithNullFirstName() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfCreateEmployeeWithNullFirstName()");
+    public void shouldReturn400IfCreateEmployeeWithNullFirstName() throws Exception {
+        LOGGER.debug("shouldReturn400IfCreateEmployeeWithNullFirstName()");
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setFirstName(null);
 
@@ -129,8 +129,8 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfCreateEmployeeWithNullLastName() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfCreateEmployeeWithNullLastName()");
+    public void shouldReturn400IfCreateEmployeeWithNullLastName() throws Exception {
+        LOGGER.debug("shouldReturn400IfCreateEmployeeWithNullLastName()");
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setLastName(null);
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.create(
@@ -172,8 +172,8 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullFirstName() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullFirstName()");
+    public void shouldReturn400IfUpdateEmployeeWithNullFirstName() throws Exception {
+        LOGGER.debug("shouldReturn400IfUpdateEmployeeWithNullFirstName()");
         Integer id = 2;
         Employee employee = employeeService.findById(id);
 
@@ -189,8 +189,8 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullLastName() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullLastName()");
+    public void shouldReturn400IfUpdateEmployeeWithNullLastName() throws Exception {
+        LOGGER.debug("shouldReturn400IfUpdateEmployeeWithNullLastName()");
         Integer id = 2;
         Employee employee = employeeService.findById(id);
 
@@ -206,8 +206,8 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithLowAge() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithLowAge()");
+    public void shouldReturn400IfUpdateEmployeeWithLowAge() throws Exception {
+        LOGGER.debug("shouldReturn400IfUpdateEmployeeWithLowAge()");
         Integer id = 2;
         Employee employee = employeeService.findById(id);
 
@@ -230,8 +230,8 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnNotFoundForDeleteEmployeeWithWrongId() throws Exception {
-        LOGGER.debug("shouldReturnNotFoundForDeleteEmployeeWithWrongId");
+    public void shouldReturn404ForDeleteEmployeeWithWrongId() throws Exception {
+        LOGGER.debug("shouldReturn404ForDeleteEmployeeWithWrongId");
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.delete(
                 999,
                 status().isNotFound(),
