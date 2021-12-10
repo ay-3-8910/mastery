@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
 import com.mastery.java.task.rest.excepton_handling.EmployeeErrorMessage;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +108,7 @@ public class EmployeeControllerIntegrationTest {
 
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.create(
                 newEmployee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
 
         assertNotNull(errorMessage);
         assertEquals("The employee must be over 18 years old", errorMessage.getInfo());
@@ -123,7 +122,7 @@ public class EmployeeControllerIntegrationTest {
 
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.create(
                 newEmployee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
 
         assertNotNull(errorMessage);
         assertEquals("Employee firstname cannot be empty", errorMessage.getInfo());
@@ -136,7 +135,7 @@ public class EmployeeControllerIntegrationTest {
         newEmployee.setLastName(null);
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.create(
                 newEmployee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
 
         assertNotNull(errorMessage);
         assertEquals("Employee lastname cannot be empty", errorMessage.getInfo());
@@ -182,7 +181,7 @@ public class EmployeeControllerIntegrationTest {
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
                 id,
                 employee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
         assertEquals(3, employeeService.count());
 
         assertNotNull(errorMessage);
@@ -199,7 +198,7 @@ public class EmployeeControllerIntegrationTest {
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
                 id,
                 employee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
         assertEquals(3, employeeService.count());
 
         assertNotNull(errorMessage);
@@ -216,7 +215,7 @@ public class EmployeeControllerIntegrationTest {
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
                 id,
                 employee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
         assertEquals(3, employeeService.count());
 
         assertNotNull(errorMessage);
