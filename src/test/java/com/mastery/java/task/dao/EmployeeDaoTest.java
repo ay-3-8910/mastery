@@ -109,7 +109,6 @@ class EmployeeDaoTest {
     public void shouldDeleteEmployee() {
         LOGGER.debug("shouldDeleteEmployee()");
         Integer employeesCountBefore = employeeDao.getEmployeesCount();
-        assertTrue(employeeDao.deleteEmployee(2));
         assertEquals(employeesCountBefore - 1, employeeDao.getEmployeesCount());
     }
 

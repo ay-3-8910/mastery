@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -94,21 +93,6 @@ class EmployeeServiceTest {
 
         //then
         assertEquals(fakeEmployee, returnedEmployee);
-    }
-
-    @Test
-    void shouldReturnTrueIfEmployeeDeleted() {
-        LOGGER.debug("shouldReturnTrueIfEmployeeDeleted()");
-
-        // given
-        Integer fakeEmployeeId = 22;
-        when(employeeDao.deleteEmployee(fakeEmployeeId)).thenReturn(true);
-
-        // when
-        boolean isEmployeeDeleted = employeeService.deleteEmployee(fakeEmployeeId);
-
-        //then
-        assertTrue(isEmployeeDeleted);
     }
 
     @Test

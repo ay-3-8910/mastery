@@ -107,7 +107,7 @@ public class EmployeeDao {
         return employee;
     }
 
-    public boolean deleteEmployee(Integer id) {
+    public void deleteEmployee(Integer id) {
         LOGGER.debug("Request to delete employee id: {}", id);
         int numberOfDeletedEmployees = namedParameterJdbcTemplate.update(
                 sqlDeleteEmployeeById,
@@ -116,8 +116,6 @@ public class EmployeeDao {
         if (numberOfDeletedEmployees == 0) {
             throw new NotFoundMasteryException("Employee id: " + id + " was not found in database");
         }
-
-        return numberOfDeletedEmployees > 0;
     }
 
     public Integer getEmployeesCount() {

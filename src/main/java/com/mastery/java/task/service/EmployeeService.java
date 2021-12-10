@@ -62,10 +62,9 @@ public class EmployeeService {
      * Delete employee by Id.
      *
      * @param employeeId employee Id.
-     * @return has employee deleted.
      */
-    public boolean deleteEmployee(Integer employeeId) {
-        return employeeDao.deleteEmployee(employeeId);
+    public void deleteEmployee(Integer employeeId) {
+        employeeDao.deleteEmployee(employeeId);
     }
 
     /**
