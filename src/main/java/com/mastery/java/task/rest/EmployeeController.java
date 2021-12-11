@@ -35,7 +35,7 @@ public class EmployeeController {
      *
      * @return Employees list.
      */
-    @GetMapping(value = "", produces = {"application/json"})
+    @GetMapping(produces = {"application/json"})
     public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
@@ -57,7 +57,7 @@ public class EmployeeController {
      * @param employee object.
      * @return saved employee.
      */
-    @PostMapping(value = "", consumes = {"application/json"}, produces = {"application/json"})
+    @PostMapping(consumes = {"application/json"}, produces = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
     public Employee createEmployee(@Valid @RequestBody Employee employee) {
         return employeeService.createEmployee(employee);
