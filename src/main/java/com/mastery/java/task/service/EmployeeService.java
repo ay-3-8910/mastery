@@ -1,6 +1,7 @@
 package com.mastery.java.task.service;
 
-import com.mastery.java.task.dao.EmployeeDao;
+import com.mastery.java.task.dao.EmployeeDaoJdbc;
+import com.mastery.java.task.dao.EmployeeDaoJpa;
 import com.mastery.java.task.dto.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,10 @@ import java.util.List;
 public class EmployeeService {
 
     @Autowired
-    private EmployeeDao employeeDao;
+    private EmployeeDaoJdbc employeeDao;
+
+    @Autowired
+    private EmployeeDaoJpa employeeDaoJpa;
 
     /**
      * Employees list.

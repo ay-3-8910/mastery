@@ -26,7 +26,7 @@ import java.util.Optional;
  * @author Sergey Tsynin
  */
 @Repository
-public class EmployeeDao {
+public class EmployeeDaoJdbc {
 
     @SuppressWarnings("unused")
     @Value("${sqlGetAllEmployee}")
@@ -52,14 +52,14 @@ public class EmployeeDao {
     @Value("${sqlUpdateEmployee}")
     private String sqlUpdateEmployee;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeDaoJdbc.class);
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     RowMapper<Employee> rowMapper = BeanPropertyRowMapper.newInstance(Employee.class);
 
-    public EmployeeDao(DataSource dataSource) {
-        LOGGER.debug("Employees DAO was created");
+    public EmployeeDaoJdbc(DataSource dataSource) {
+        LOGGER.debug("Employees DAO JDBC was created");
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
