@@ -26,7 +26,7 @@ import java.util.Optional;
  * @author Sergey Tsynin
  */
 @Repository
-public class EmployeeDaoJdbc {
+public class EmployeeDaoJdbc implements EmployeeDao{
 
     @SuppressWarnings("unused")
     @Value("${sqlGetAllEmployee}")
@@ -63,12 +63,14 @@ public class EmployeeDaoJdbc {
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
+    @Override
     public List<Employee> getAllEmployees() {
         return namedParameterJdbcTemplate.query(
                 sqlGetAllEmployee,
                 rowMapper);
     }
 
+    @Override
     public Employee getEmployeeById(Integer id) {
         List<Employee> passengers = namedParameterJdbcTemplate.query(
                 sqlGetEmployeeById,
@@ -82,6 +84,7 @@ public class EmployeeDaoJdbc {
         return optionalEmployee.get();
     }
 
+    @Override
     public Employee createEmployee(Employee employee) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -94,6 +97,7 @@ public class EmployeeDaoJdbc {
         return employee;
     }
 
+    @Override
     public Employee updateEmployee(Employee employee) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -107,6 +111,7 @@ public class EmployeeDaoJdbc {
         return employee;
     }
 
+    @Override
     public void deleteEmployee(Integer id) {
         int numberOfDeletedEmployees = namedParameterJdbcTemplate.update(
                 sqlDeleteEmployeeById,
@@ -117,6 +122,7 @@ public class EmployeeDaoJdbc {
         }
     }
 
+    @Override
     public Integer getEmployeesCount() {
         return namedParameterJdbcTemplate.queryForObject(
                 sqlGetEmployeesCount,

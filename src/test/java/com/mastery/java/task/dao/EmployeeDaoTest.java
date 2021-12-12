@@ -33,14 +33,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class EmployeeDaoTest {
 
     @Autowired
-    EmployeeDaoJdbc employeeDaoJdbc;
+    EmployeeDaoJdbc employeeDao;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeDaoTest.class);
 
     @Test
     public void shouldReturnEmployeesList() {
         LOGGER.debug("shouldReturnEmployeesList()");
-        List<Employee> employees = employeeDaoJdbc.getAllEmployees();
+        List<Employee> employees = employeeDao.getAllEmployees();
         assertNotNull(employees);
         assertEquals(3, employees.size());
     }
@@ -48,7 +48,7 @@ class EmployeeDaoTest {
     @Test
     public void shouldReturnEmployee() {
         LOGGER.debug("shouldReturnEmployee()");
-        Employee employee = employeeDaoJdbc.getEmployeeById(2);
+        Employee employee = employeeDao.getEmployeeById(2);
         assertEquals(2, employee.getEmployeeId());
         assertEquals("Rudolph", employee.getFirstName());
         assertEquals("the Deer", employee.getLastName());
@@ -61,56 +61,56 @@ class EmployeeDaoTest {
     @Test
     public void shouldReturnExceptionWithUnknownEmployeeId() {
         LOGGER.debug("shouldReturnExceptionWithUnknownEmployeeId()");
-        Exception exception = assertThrows(NotFoundMasteryException.class, () -> employeeDaoJdbc.getEmployeeById(99));
+        Exception exception = assertThrows(NotFoundMasteryException.class, () -> employeeDao.getEmployeeById(99));
         assertEquals("Employee id: 99 was not found in database", exception.getMessage());
     }
 
     @Test
     public void shouldReturnCountOfEmployees() {
         LOGGER.debug("shouldReturnCountOfEmployees()");
-        Integer actualCount = employeeDaoJdbc.getAllEmployees().size();
-        assertEquals(actualCount, employeeDaoJdbc.getEmployeesCount());
+        Integer actualCount = employeeDao.getAllEmployees().size();
+        assertEquals(actualCount, employeeDao.getEmployeesCount());
     }
 
     @Test
     public void shouldSaveNewEmployee() {
         LOGGER.debug("shouldSaveNewEmployee()");
-        Integer employeesCountBefore = employeeDaoJdbc.getEmployeesCount();
+        Integer employeesCountBefore = employeeDao.getEmployeesCount();
         Employee newEmployee = getFakeEmployee(128);
-        Employee savedEmployee = employeeDaoJdbc.createEmployee(newEmployee);
+        Employee savedEmployee = employeeDao.createEmployee(newEmployee);
         assertEquals(4, savedEmployee.getEmployeeId());
-        assertEquals(employeesCountBefore + 1, employeeDaoJdbc.getEmployeesCount());
-        assertEquals(newEmployee, employeeDaoJdbc.getEmployeeById(savedEmployee.getEmployeeId()));
+        assertEquals(employeesCountBefore + 1, employeeDao.getEmployeesCount());
+        assertEquals(newEmployee, employeeDao.getEmployeeById(savedEmployee.getEmployeeId()));
     }
 
     @Test
     public void shouldUpdateEmployee() {
         LOGGER.debug("shouldUpdateEmployee()");
-        Integer employeesCountBefore = employeeDaoJdbc.getEmployeesCount();
+        Integer employeesCountBefore = employeeDao.getEmployeesCount();
         String newJobTitle = "head of bottles washing";
         Integer employeeId = 2;
 
-        Employee oldEmployee = employeeDaoJdbc.getEmployeeById(employeeId);
+        Employee oldEmployee = employeeDao.getEmployeeById(employeeId);
         oldEmployee.setJobTitle(newJobTitle);
-        employeeDaoJdbc.updateEmployee(oldEmployee);
-        assertEquals(employeesCountBefore, employeeDaoJdbc.getEmployeesCount());
-        assertEquals(newJobTitle, employeeDaoJdbc.getEmployeeById(employeeId).getJobTitle());
+        employeeDao.updateEmployee(oldEmployee);
+        assertEquals(employeesCountBefore, employeeDao.getEmployeesCount());
+        assertEquals(newJobTitle, employeeDao.getEmployeeById(employeeId).getJobTitle());
     }
 
     @Test
     public void shouldReturnExceptionIfUpdateEmployeeWithUnknownId() {
         LOGGER.debug("shouldReturnExceptionIfUpdateEmployeeWithUnknownId()");
         Employee fakeEmployee = getFakeEmployee(128);
-        Exception exception = assertThrows(NotFoundMasteryException.class, () -> employeeDaoJdbc.updateEmployee(fakeEmployee));
+        Exception exception = assertThrows(NotFoundMasteryException.class, () -> employeeDao.updateEmployee(fakeEmployee));
         assertEquals("Employee was not found in database", exception.getMessage());
     }
 
     @Test
     public void shouldDeleteEmployee() {
         LOGGER.debug("shouldDeleteEmployee()");
-        Integer employeesCountBefore = employeeDaoJdbc.getEmployeesCount();
-        employeeDaoJdbc.deleteEmployee(1);
-        assertEquals(employeesCountBefore - 1, employeeDaoJdbc.getEmployeesCount());
+        Integer employeesCountBefore = employeeDao.getEmployeesCount();
+        employeeDao.deleteEmployee(1);
+        assertEquals(employeesCountBefore - 1, employeeDao.getEmployeesCount());
     }
 
     private Employee getFakeEmployee(@SuppressWarnings("SameParameterValue") Integer id) {
