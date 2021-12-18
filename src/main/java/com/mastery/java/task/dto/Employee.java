@@ -13,8 +13,13 @@ import java.util.Objects;
  * @author Sergey Tsynin
  * POJO Employee for model.
  */
+@Entity
+@Table(name = "EMPLOYEE")
 public class Employee {
 
+    @Id
+    @Column(name = "employee_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer employeeId;
 
     @NotNull(message = "Employee firstname cannot be empty")
@@ -27,6 +32,7 @@ public class Employee {
 
     private String jobTitle;
 
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
