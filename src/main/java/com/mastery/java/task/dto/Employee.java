@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -20,7 +21,7 @@ public class Employee {
     @Id
     @Column(name = "employee_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer employeeId;
+    private Integer id;
 
     @NotNull(message = "Employee firstname cannot be empty")
     private String firstName;
@@ -47,11 +48,11 @@ public class Employee {
     }
 
     public Integer getEmployeeId() {
-        return employeeId;
+        return id;
     }
 
-    public void setEmployeeId(Integer employeeId) {
-        this.employeeId = employeeId;
+    public void setEmployeeId(Integer id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -105,7 +106,7 @@ public class Employee {
     @Override
     public String toString() {
         return "Employee {" +
-                "employeeId=" + employeeId +
+                "employeeId=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", departmentId=" + departmentId +
@@ -120,7 +121,7 @@ public class Employee {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Employee employee = (Employee) o;
-        return Objects.equals(employeeId, employee.employeeId) &&
+        return Objects.equals(id, employee.id) &&
                 Objects.equals(firstName, employee.firstName) &&
                 Objects.equals(lastName, employee.lastName) &&
                 Objects.equals(departmentId, employee.departmentId) &&
@@ -131,6 +132,6 @@ public class Employee {
 
     @Override
     public int hashCode() {
-        return Objects.hash(employeeId, firstName, lastName, departmentId, jobTitle, gender, dateOfBirth);
+        return Objects.hash(id, firstName, lastName, departmentId, jobTitle, gender, dateOfBirth);
     }
 }
