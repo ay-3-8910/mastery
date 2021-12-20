@@ -3,15 +3,15 @@ package com.mastery.java.task.dao;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
 import com.mastery.java.task.rest.excepton_handling.NotFoundMasteryException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -20,20 +20,26 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Sergey Tsynin
  */
-@SpringBootTest()
+@DataJpaTest
+@Import(EmployeeDaoJpa.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = {"classpath:db-schema.sql", "classpath:db-init.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-class EmployeeDaoJpaTest {
+public class EmployeeDaoJpaTest {
 
     @Autowired
     private EmployeeDaoJpa employeeDao;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeDaoTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeDaoJdbcTest.class);
 
     @Test
     public void shouldReturnEmployeesList() {
         LOGGER.debug("shouldReturnEmployeesList()");
+
+        // when
         List<Employee> employees = employeeDao.getAllEmployees();
+
+        // then
         assertNotNull(employees);
         assertEquals(3, employees.size());
     }
@@ -41,9 +47,11 @@ class EmployeeDaoJpaTest {
     @Test
     public void shouldReturnEmployeeById() {
         LOGGER.debug("shouldReturnEmployeeById()");
-        Integer id = 2;
 
-        Employee employee = employeeDao.getEmployeeById(id);
+        //when
+        Employee employee = employeeDao.getEmployeeById(2);
+
+        // then
         assertEquals(2, employee.getEmployeeId());
         assertEquals("Rudolph", employee.getFirstName());
         assertEquals("the Deer", employee.getLastName());
@@ -56,6 +64,8 @@ class EmployeeDaoJpaTest {
     @Test
     public void shouldReturnExceptionWithUnknownEmployeeId() {
         LOGGER.debug("shouldReturnExceptionWithUnknownEmployeeId()");
+
+        // then
         Exception exception = assertThrows(NotFoundMasteryException.class,
                 () -> employeeDao.getEmployeeById(99));
         assertEquals("Employee id: 99 was not found in database", exception.getMessage());
@@ -64,72 +74,48 @@ class EmployeeDaoJpaTest {
     @Test
     public void shouldCreateNewEmployee() {
         LOGGER.debug("shouldCreateNewEmployee()");
+
+        // given
         Integer employeesCountBefore = employeeDao.getEmployeesCount();
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setDateOfBirth(LocalDate.now().minusYears(18));
+
+        // when
         Employee savedEmployee = employeeDao.createEmployee(newEmployee);
+
+        // then
         assertNotNull(savedEmployee);
-        assertEquals(4, savedEmployee.getEmployeeId());
         assertEquals(employeesCountBefore + 1, employeeDao.getEmployeesCount());
-        newEmployee.setEmployeeId(4);
+        newEmployee.setEmployeeId(savedEmployee.getEmployeeId());
         assertEquals(newEmployee, employeeDao.getEmployeeById(savedEmployee.getEmployeeId()));
-    }
-
-    @Test
-    public void shouldReturnExceptionIfCreateTooYoungEmployee() {
-        LOGGER.debug("shouldReturnExceptionIfCreateTooYoungEmployee()");
-        Integer employeesCountBefore = employeeDao.getEmployeesCount();
-        Employee newEmployee = getFakeEmployee(128);
-        newEmployee.setDateOfBirth(LocalDate.now());
-        Exception exception = assertThrows(ConstraintViolationException.class,
-                () -> employeeDao.createEmployee(newEmployee));
-        assertTrue(exception.getMessage().contains("The employee must be over 18 years old"));
-        assertEquals(employeesCountBefore, employeeDao.getEmployeesCount());
-    }
-
-    @Test
-    public void shouldReturnExceptionIfCreateEmployeeWithNullFirstName() {
-        LOGGER.debug("shouldReturnExceptionIfCreateEmployeeWithNullFirstName()");
-        Integer employeesCountBefore = employeeDao.getEmployeesCount();
-        Employee newEmployee = getFakeEmployee(128);
-        newEmployee.setFirstName(null);
-        Exception exception = assertThrows(ConstraintViolationException.class,
-                () -> employeeDao.createEmployee(newEmployee));
-        assertTrue(exception.getMessage().contains("Employee firstname cannot be empty"));
-        assertEquals(employeesCountBefore, employeeDao.getEmployeesCount());
-    }
-
-    @Test
-    public void shouldReturnExceptionIfCreateEmployeeWithNullLastName() {
-        LOGGER.debug("shouldReturnExceptionIfCreateEmployeeWithNullLastName()");
-        Integer employeesCountBefore = employeeDao.getEmployeesCount();
-        Employee newEmployee = getFakeEmployee(128);
-        newEmployee.setLastName(null);
-        Exception exception = assertThrows(ConstraintViolationException.class,
-                () -> employeeDao.createEmployee(newEmployee));
-        assertTrue(exception.getMessage().contains("Employee lastname cannot be empty"));
-        assertEquals(employeesCountBefore, employeeDao.getEmployeesCount());
     }
 
     @Test
     public void shouldUpdateEmployee() {
         LOGGER.debug("shouldUpdateEmployee()");
-        Integer employeesCountBefore = employeeDao.getEmployeesCount();
-        String newJobTitle = "head of bottles washing";
-        Integer employeeId = 2;
 
-        Employee oldEmployee = employeeDao.getEmployeeById(employeeId);
-        oldEmployee.setJobTitle(newJobTitle);
+        // given
+        Integer employeesCountBefore = employeeDao.getEmployeesCount();
+        Integer employeeId = 2;
+        Employee oldEmployee = getFakeEmployee(employeeId);
+
+        // when
         employeeDao.updateEmployee(oldEmployee);
+
+        // then
         assertEquals(employeesCountBefore, employeeDao.getEmployeesCount());
-        assertEquals(newJobTitle, employeeDao.getEmployeeById(employeeId).getJobTitle());
+        assertEquals(oldEmployee, employeeDao.getEmployeeById(employeeId));
     }
 
     @Test
     public void shouldReturnExceptionIfUpdateEmployeeWithUnknownId() {
         LOGGER.debug("shouldReturnExceptionIfUpdateEmployeeWithUnknownId()");
+
+        // given
         Integer employeesCountBefore = employeeDao.getEmployeesCount();
         Employee fakeEmployee = getFakeEmployee(128);
+
+        // then
         Exception exception = assertThrows(NotFoundMasteryException.class,
                 () -> employeeDao.updateEmployee(fakeEmployee));
         assertEquals("Employee id: 128 was not found in database", exception.getMessage());
@@ -137,61 +123,24 @@ class EmployeeDaoJpaTest {
     }
 
     @Test
-    @Disabled
-    public void shouldReturnExceptionIfUpdateEmployeeWithNullFirstName() {
-        LOGGER.debug("shouldReturnExceptionIfUpdateEmployeeWithNullFirstName()");
-        Integer employeesCountBefore = employeeDao.getEmployeesCount();
-        Integer employeeId = 2;
-
-        Employee oldEmployee = getFakeEmployee(2);
-        oldEmployee.setFirstName(null);
-        Exception exception = assertThrows(ConstraintViolationException.class,
-                () -> employeeDao.updateEmployee(oldEmployee));
-        assertTrue(exception.getMessage().contains("Employee firstname cannot be empty"));
-        assertEquals(employeesCountBefore, employeeDao.getEmployeesCount());
-    }
-
-    @Test
-    @Disabled
-    public void shouldReturnExceptionIfUpdateEmployeeWithNullLastName() {
-        LOGGER.debug("shouldReturnExceptionIfUpdateEmployeeWithNullLastName()");
-        Integer employeesCountBefore = employeeDao.getEmployeesCount();
-        Integer employeeId = 2;
-
-        Employee oldEmployee = employeeDao.getEmployeeById(employeeId);
-        oldEmployee.setLastName(null);
-        Exception exception = assertThrows(ConstraintViolationException.class,
-                () -> employeeDao.updateEmployee(oldEmployee));
-        assertTrue(exception.getMessage().contains("Employee lastname cannot be empty"));
-        assertEquals(employeesCountBefore, employeeDao.getEmployeesCount());
-    }
-
-    @Test
-    @Disabled
-    public void shouldReturnExceptionIfUpdateEmployeeWithLowAge() {
-        LOGGER.debug("shouldReturnExceptionIfUpdateEmployeeWithLowAge()");
-        Integer employeesCountBefore = employeeDao.getEmployeesCount();
-        Integer employeeId = 2;
-
-        Employee oldEmployee = employeeDao.getEmployeeById(employeeId);
-        oldEmployee.setDateOfBirth(LocalDate.now());
-        Exception exception = assertThrows(ConstraintViolationException.class,
-                () -> employeeDao.updateEmployee(oldEmployee));
-        assertTrue(exception.getMessage().contains("The employee must be over 18 years old"));
-        assertEquals(employeesCountBefore, employeeDao.getEmployeesCount());
-    }
-
-    @Test
     public void shouldDeleteEmployee() {
         LOGGER.debug("shouldDeleteEmployee()");
+
+        // given
         Integer employeesCountBefore = employeeDao.getEmployeesCount();
+
+        // when
         employeeDao.deleteEmployee(1);
+
+        // then
         assertEquals(employeesCountBefore - 1, employeeDao.getEmployeesCount());
     }
 
     @Test
     public void shouldReturnExceptionIfDeleteEmployeeWithUnknownId() {
         LOGGER.debug("shouldReturnExceptionIfDeleteEmployeeWithUnknownId()");
+
+        // then
         Exception exception = assertThrows(NotFoundMasteryException.class,
                 () -> employeeDao.deleteEmployee(128));
         assertEquals("Employee id: 128 was not found in database", exception.getMessage());
@@ -200,7 +149,11 @@ class EmployeeDaoJpaTest {
     @Test
     public void shouldReturnCountOfEmployees() {
         LOGGER.debug("shouldReturnCountOfEmployees()");
+
+        // when
         Integer actualCount = employeeDao.getAllEmployees().size();
+
+        // then
         assertEquals(actualCount, employeeDao.getEmployeesCount());
     }
 
@@ -215,5 +168,4 @@ class EmployeeDaoJpaTest {
         employee.setDateOfBirth(LocalDate.now().minusYears(18));
         return employee;
     }
-
 }
