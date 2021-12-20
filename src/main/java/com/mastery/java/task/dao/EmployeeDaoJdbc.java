@@ -79,7 +79,7 @@ public class EmployeeDaoJdbc implements EmployeeDao{
         Optional<Employee> optionalEmployee = Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
 
         if (optionalEmployee.isEmpty()) {
-            throw new NotFoundMasteryException("Employee id: " + id + " was not found in database");
+            throw new NotFoundMasteryException(id);
         }
         return optionalEmployee.get();
     }
@@ -106,7 +106,7 @@ public class EmployeeDaoJdbc implements EmployeeDao{
                 getParameterSource(employee),
                 keyHolder, new String[]{"employee_id"});
         if (keyHolder.getKey() == null) {
-            throw new NotFoundMasteryException("Employee was not found in database");
+            throw new NotFoundMasteryException(employee.getEmployeeId());
         }
         return employee;
     }
@@ -118,7 +118,7 @@ public class EmployeeDaoJdbc implements EmployeeDao{
                 new MapSqlParameterSource("EMPLOYEE_ID", id));
 
         if (numberOfDeletedEmployees == 0) {
-            throw new NotFoundMasteryException("Employee id: " + id + " was not found in database");
+            throw new NotFoundMasteryException(id);
         }
     }
 

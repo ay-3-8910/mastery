@@ -33,7 +33,7 @@ public class EmployeeDaoJpa implements EmployeeDao {
     public Employee getEmployeeById(Integer employeeId) {
         return employeeJpaRepository.findById(employeeId)
                 .orElseThrow(() ->
-                        new NotFoundMasteryException("Employee id: " + employeeId + " was not found in database"));
+                        new NotFoundMasteryException(employeeId));
     }
 
     @Override
@@ -43,18 +43,19 @@ public class EmployeeDaoJpa implements EmployeeDao {
 
     @Override
     public Employee updateEmployee(Employee employee) {
-        if (!employeeJpaRepository.existsById(employee.getEmployeeId())) {
-            throw new NotFoundMasteryException("Employee was not found in database");
+        Integer employeeId = employee.getEmployeeId();
+        if (!employeeJpaRepository.existsById(employeeId)) {
+            throw new NotFoundMasteryException(employeeId);
         }
         return employeeJpaRepository.save(employee);
     }
 
     @Override
-    public void deleteEmployee(Integer id) {
-        if (!employeeJpaRepository.existsById(id)) {
-            throw new NotFoundMasteryException("Employee was not found in database");
+    public void deleteEmployee(Integer employeeId) {
+        if (!employeeJpaRepository.existsById(employeeId)) {
+            throw new NotFoundMasteryException(employeeId);
         }
-        employeeJpaRepository.deleteById(id);
+        employeeJpaRepository.deleteById(employeeId);
     }
 
     @Override

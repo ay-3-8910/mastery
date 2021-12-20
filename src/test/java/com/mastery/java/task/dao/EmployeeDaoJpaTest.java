@@ -132,7 +132,7 @@ class EmployeeDaoJpaTest {
         Employee fakeEmployee = getFakeEmployee(128);
         Exception exception = assertThrows(NotFoundMasteryException.class,
                 () -> employeeDao.updateEmployee(fakeEmployee));
-        assertEquals("Employee was not found in database", exception.getMessage());
+        assertEquals("Employee id: 128 was not found in database", exception.getMessage());
         assertEquals(employeesCountBefore, employeeDao.getEmployeesCount());
     }
 
@@ -194,7 +194,7 @@ class EmployeeDaoJpaTest {
         LOGGER.debug("shouldReturnExceptionIfDeleteEmployeeWithUnknownId()");
         Exception exception = assertThrows(NotFoundMasteryException.class,
                 () -> employeeDao.deleteEmployee(128));
-        assertEquals("Employee was not found in database", exception.getMessage());
+        assertEquals("Employee id: 128 was not found in database", exception.getMessage());
     }
 
     @Test

@@ -5,7 +5,7 @@ package com.mastery.java.task.rest.excepton_handling;
  */
 public class NotFoundMasteryException extends RuntimeException {
 
-    public NotFoundMasteryException(String message) {
-        super(message);
+    public NotFoundMasteryException(Integer employeeId) {
+        super("Employee id: " + employeeId + " was not found in database");
     }
 }
