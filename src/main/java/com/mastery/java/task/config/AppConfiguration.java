@@ -29,6 +29,23 @@ public class AppConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppConfiguration.class);
 
+//    @Bean
+//    @ConditionalOnProperty(value = "employee.dao", havingValue = "jdbc")
+//    DataSource dataSource() {
+//        try {
+//            DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
+//            driverManagerDataSource.setDriverClassName(driverClassName);
+//            driverManagerDataSource.setUrl(jdbcURl);
+//            driverManagerDataSource.setUsername(dbUsername);
+//            driverManagerDataSource.setPassword(dbPassword);
+//            LOGGER.debug("DataSource was created");
+//            return driverManagerDataSource;
+//        } catch (Exception e) {
+//            LOGGER.error("DataSource bean cannot be created", e);
+//            return null;
+//        }
+//    }
+
     @Bean
     DataSource dataSource() {
         try {
