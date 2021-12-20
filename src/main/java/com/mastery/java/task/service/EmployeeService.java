@@ -1,11 +1,9 @@
 package com.mastery.java.task.service;
 
-import com.mastery.java.task.dao.EmployeeDaoJdbc;
-import com.mastery.java.task.dao.EmployeeDaoJpa;
+import com.mastery.java.task.dao.EmployeeDao;
 import com.mastery.java.task.dto.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -13,14 +11,10 @@ import java.util.List;
  * @author Sergey Tsynin
  */
 @Service
-@Validated
 public class EmployeeService {
 
     @Autowired
-    private EmployeeDaoJdbc employeeDao;
-
-    @Autowired
-    private EmployeeDaoJpa employeeDaoJpa;
+    private EmployeeDao employeeDao;
 
     /**
      * Employees list.
@@ -77,6 +71,6 @@ public class EmployeeService {
      * @return the number of employees in the database.
      */
     public Integer getEmployeesCount() {
-        return Math.toIntExact(employeeDao.getEmployeesCount());
+        return employeeDao.getEmployeesCount();
     }
 }

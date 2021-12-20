@@ -5,14 +5,12 @@ import com.mastery.java.task.rest.excepton_handling.NotFoundMasteryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * @author Sergey Tsynin
  */
-@Component
 public class EmployeeDaoJpa implements EmployeeDao {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeDaoJpa.class);
