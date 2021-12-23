@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.jdbc.Sql;
@@ -32,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(controllers = EmployeeController.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ComponentScan(basePackages = "com.mastery.java.task")
 @Sql(scripts = {"classpath:db-schema.sql", "classpath:db-init.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class EmployeeControllerIntegrationTest {
@@ -75,12 +77,12 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnNotFoundWithTryToFindUnknownId() throws Exception {
-        LOGGER.debug("shouldReturnNotFoundWithTryToFindUnknownId()");
+    public void shouldReturn404WithTryToFindUnknownId() throws Exception {
+        LOGGER.debug("shouldReturn404WithTryToFindUnknownId()");
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.read(999, status().isNotFound()));
 
         assertNotNull(errorMessage);
-        assertEquals("Employee id:999 was not found in database", errorMessage.getInfo());
+        assertEquals("Employee id: 999 was not found in database", errorMessage.getInfo());
     }
 
     @Test
@@ -99,41 +101,41 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfCreateTooYoungEmployee() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfCreateTooYoungEmployee()");
+    public void shouldReturn400IfCreateTooYoungEmployee() throws Exception {
+        LOGGER.debug("shouldReturn400IfCreateTooYoungEmployee()");
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setDateOfBirth(LocalDate.now());
 
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.create(
                 newEmployee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
 
         assertNotNull(errorMessage);
         assertEquals("The employee must be over 18 years old", errorMessage.getInfo());
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfCreateEmployeeWithNullFirstName() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfCreateEmployeeWithNullFirstName()");
+    public void shouldReturn400IfCreateEmployeeWithNullFirstName() throws Exception {
+        LOGGER.debug("shouldReturn400IfCreateEmployeeWithNullFirstName()");
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setFirstName(null);
 
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.create(
                 newEmployee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
 
         assertNotNull(errorMessage);
         assertEquals("Employee firstname cannot be empty", errorMessage.getInfo());
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfCreateEmployeeWithNullLastName() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfCreateEmployeeWithNullLastName()");
+    public void shouldReturn400IfCreateEmployeeWithNullLastName() throws Exception {
+        LOGGER.debug("shouldReturn400IfCreateEmployeeWithNullLastName()");
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setLastName(null);
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.create(
                 newEmployee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
 
         assertNotNull(errorMessage);
         assertEquals("Employee lastname cannot be empty", errorMessage.getInfo());
@@ -143,32 +145,32 @@ public class EmployeeControllerIntegrationTest {
     public void shouldUpdateEmployee() throws Exception {
         LOGGER.debug("shouldUpdateEmployee()");
         Integer id = 2;
-        String newJobTitle = "head of bottles washing";
+        Employee employee = getFakeEmployee(id);
 
-        Employee employee = employeeService.findById(id);
-        employee.setJobTitle(newJobTitle);
-        String returnedJobTitle = extractEmployee(employeeService.update(id, employee, status().isOk())).getJobTitle();
+        extractEmployee(employeeService.update(id, employee, status().isOk()));
 
         assertEquals(3, employeeService.count());
-        assertEquals(newJobTitle, returnedJobTitle);
-        assertEquals(newJobTitle, employeeService.findById(id).getJobTitle());
+        assertEquals(employee, employeeService.findById(id));
     }
 
     @Test
-    public void shouldCreateNewEmployeeIfUpdateEmployeeWithUnknownId() throws Exception {
-        LOGGER.debug("shouldCreateNewEmployeeIfUpdateEmployeeWithUnknownId()");
+    public void shouldReturn404IfUpdateEmployeeWithUnknownId() throws Exception {
+        LOGGER.debug("shouldReturn404IfUpdateEmployeeWithUnknownId()");
         Integer id = 99;
-        Employee newEmployee = getFakeEmployee(id);
+        Employee employee = getFakeEmployee(id);
 
-        Employee employee = extractEmployee(employeeService.update(id, newEmployee, status().isCreated()));
+        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
+                id,
+                employee,
+                status().isNotFound()));
 
-        assertEquals(4, employeeService.count());
-        assertEquals(4, employee.getEmployeeId());
+        assertEquals(3, employeeService.count());
+        assertEquals("Employee id: 99 was not found in database", errorMessage.getInfo());
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullFirstName() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullFirstName()");
+    public void shouldReturn400IfUpdateEmployeeWithNullFirstName() throws Exception {
+        LOGGER.debug("shouldReturn400IfUpdateEmployeeWithNullFirstName()");
         Integer id = 2;
         Employee employee = employeeService.findById(id);
 
@@ -176,7 +178,7 @@ public class EmployeeControllerIntegrationTest {
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
                 id,
                 employee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
         assertEquals(3, employeeService.count());
 
         assertNotNull(errorMessage);
@@ -184,8 +186,8 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullLastName() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithNullLastName()");
+    public void shouldReturn400IfUpdateEmployeeWithNullLastName() throws Exception {
+        LOGGER.debug("shouldReturn400IfUpdateEmployeeWithNullLastName()");
         Integer id = 2;
         Employee employee = employeeService.findById(id);
 
@@ -193,7 +195,7 @@ public class EmployeeControllerIntegrationTest {
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
                 id,
                 employee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
         assertEquals(3, employeeService.count());
 
         assertNotNull(errorMessage);
@@ -201,8 +203,8 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnUnprocessableEntityIfUpdateEmployeeWithLowAge() throws Exception {
-        LOGGER.debug("shouldReturnUnprocessableEntityIfUpdateEmployeeWithLowAge()");
+    public void shouldReturn400IfUpdateEmployeeWithLowAge() throws Exception {
+        LOGGER.debug("shouldReturn400IfUpdateEmployeeWithLowAge()");
         Integer id = 2;
         Employee employee = employeeService.findById(id);
 
@@ -210,7 +212,7 @@ public class EmployeeControllerIntegrationTest {
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
                 id,
                 employee,
-                status().isUnprocessableEntity()));
+                status().isBadRequest()));
         assertEquals(3, employeeService.count());
 
         assertNotNull(errorMessage);
@@ -225,15 +227,15 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
-    public void shouldReturnNotFoundForDeleteEmployeeWithWrongId() throws Exception {
-        LOGGER.debug("shouldReturnNotFoundForDeleteEmployeeWithWrongId");
+    public void shouldReturn404ForDeleteEmployeeWithWrongId() throws Exception {
+        LOGGER.debug("shouldReturn404ForDeleteEmployeeWithWrongId");
         EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.delete(
                 999,
                 status().isNotFound(),
                 content().contentType("application/json")));
 
         assertNotNull(errorMessage);
-        assertEquals("Employee id:999 was not found in database", errorMessage.getInfo());
+        assertEquals("Employee id: 999 was not found in database", errorMessage.getInfo());
 
         assertEquals(3, employeeService.count());
     }
@@ -246,6 +248,18 @@ public class EmployeeControllerIntegrationTest {
 
         assertNotNull(employeesCount);
         assertEquals(3, employeesCount);
+    }
+
+    @Test
+    public void shouldReturn400InCaseInvalidIdWithGetMethod() throws Exception {
+        LOGGER.debug("shouldReturn400InCaseInvalidIdWithGetMethod()");
+
+        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.read(
+                0,
+                status().isBadRequest()));
+
+        assertNotNull(errorMessage);
+        assertEquals("Validation error.", errorMessage.getInfo());
     }
 
     private Employee getFakeEmployee(Integer id) {

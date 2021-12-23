@@ -2,8 +2,6 @@ package com.mastery.java.task.service;
 
 import com.mastery.java.task.dao.EmployeeDao;
 import com.mastery.java.task.dto.Employee;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,20 +16,13 @@ public class EmployeeService {
     @Autowired
     private EmployeeDao employeeDao;
 
-    public EmployeeService() {
-        LOGGER.debug("Employees service was created");
-    }
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeService.class);
-
     /**
      * Employees list.
      *
      * @return Employees list.
      */
-    public List<Employee> findAll() {
-        LOGGER.debug("Employees list request from repository");
-        return employeeDao.findAll();
+    public List<Employee> getAllEmployees() {
+        return employeeDao.getAllEmployees();
     }
 
     /**
@@ -40,9 +31,8 @@ public class EmployeeService {
      * @param employeeId train Id.
      * @return employee.
      */
-    public Employee getById(Integer employeeId) {
-        LOGGER.debug("Get employee id: {} from repository", employeeId);
-        return employeeDao.findById(employeeId);
+    public Employee getEmployeeById(Integer employeeId) {
+        return employeeDao.getEmployeeById(employeeId);
     }
 
     /**
@@ -52,8 +42,7 @@ public class EmployeeService {
      * @return saved employee.
      */
     public Employee createEmployee(Employee employee) {
-        LOGGER.debug("Save employee into repository");
-        return employeeDao.save(employee);
+        return employeeDao.createEmployee(employee);
     }
 
     /**
@@ -64,19 +53,16 @@ public class EmployeeService {
      */
     public Employee updateEmployee(Employee employee) {
         Integer id = employee.getEmployeeId();
-        LOGGER.debug("Request to update employee id: {}", id);
-        return employeeDao.update(employee);
+        return employeeDao.updateEmployee(employee);
     }
 
     /**
      * Delete employee by Id.
      *
      * @param employeeId employee Id.
-     * @return has employee deleted.
      */
-    public boolean deleteEmployee(Integer employeeId) {
-        LOGGER.debug("Request to delete employee id: {}", employeeId);
-        return employeeDao.deleteById(employeeId);
+    public void deleteEmployee(Integer employeeId) {
+        employeeDao.deleteEmployee(employeeId);
     }
 
     /**
@@ -85,17 +71,6 @@ public class EmployeeService {
      * @return the number of employees in the database.
      */
     public Integer getEmployeesCount() {
-        LOGGER.debug("Get employees count");
-        return Math.toIntExact(employeeDao.count());
-    }
-
-    /**
-     * Check if employee exists in the database.
-     *
-     * @param employeeId employee Id.
-     */
-    public boolean isEmployeeExists(Integer employeeId) {
-        LOGGER.debug("Check if employee exists");
-        return employeeDao.existsById(employeeId);
+        return employeeDao.getEmployeesCount();
     }
 }

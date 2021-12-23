@@ -1,6 +1,6 @@
 package com.mastery.java.task.service;
 
-import com.mastery.java.task.dao.EmployeeDao;
+import com.mastery.java.task.dao.EmployeeDaoJdbc;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -30,7 +30,7 @@ class EmployeeServiceTest {
     EmployeeService employeeService;
 
     @Mock
-    private EmployeeDao employeeDao;
+    private EmployeeDaoJdbc employeeDaoJdbc;
 
     @Test
     void shouldFindAll() {
@@ -41,10 +41,10 @@ class EmployeeServiceTest {
         base.add(getFakeEmployee(1));
         base.add(getFakeEmployee(2));
         base.add(getFakeEmployee(3));
-        when(employeeDao.findAll()).thenReturn(base);
+        when(employeeDaoJdbc.getAllEmployees()).thenReturn(base);
 
         //when
-        List<Employee> employees = employeeService.findAll();
+        List<Employee> employees = employeeService.getAllEmployees();
 
         //then
         assertEquals(base, employees);
@@ -56,10 +56,10 @@ class EmployeeServiceTest {
 
         // given
         Employee fakeEmployee = getFakeEmployee(1);
-        when(employeeDao.findById(1)).thenReturn(fakeEmployee);
+        when(employeeDaoJdbc.getEmployeeById(1)).thenReturn(fakeEmployee);
 
         // when
-        Employee employee = employeeService.getById(1);
+        Employee employee = employeeService.getEmployeeById(1);
 
         //then
         assertEquals(fakeEmployee, employee);
@@ -71,7 +71,7 @@ class EmployeeServiceTest {
 
         // given
         Employee fakeEmployee = getFakeEmployee(22);
-        when(employeeDao.save(fakeEmployee)).thenReturn(fakeEmployee);
+        when(employeeDaoJdbc.createEmployee(fakeEmployee)).thenReturn(fakeEmployee);
 
         // when
         Employee returnedEmployee = employeeService.createEmployee(fakeEmployee);
@@ -86,7 +86,7 @@ class EmployeeServiceTest {
 
         // given
         Employee fakeEmployee = getFakeEmployee(33);
-        when(employeeDao.update(fakeEmployee)).thenReturn(fakeEmployee);
+        when(employeeDaoJdbc.updateEmployee(fakeEmployee)).thenReturn(fakeEmployee);
 
         // when
         Employee returnedEmployee = employeeService.updateEmployee(fakeEmployee);
@@ -96,26 +96,11 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void shouldReturnTrueIfEmployeeDeleted() {
-        LOGGER.debug("shouldReturnTrueIfEmployeeDeleted()");
-
-        // given
-        Integer fakeEmployeeId = 22;
-        when(employeeDao.deleteById(fakeEmployeeId)).thenReturn(true);
-
-        // when
-        boolean isEmployeeDeleted = employeeService.deleteEmployee(fakeEmployeeId);
-
-        //then
-        assertTrue(isEmployeeDeleted);
-    }
-
-    @Test
     void shouldReturnEmployeesCount() {
         LOGGER.debug("shouldReturnEmployeesCount()");
 
         // given
-        when(employeeDao.count()).thenReturn(42);
+        when(employeeDaoJdbc.getEmployeesCount()).thenReturn(42);
 
         // when
         Integer employeesCount = employeeService.getEmployeesCount();
