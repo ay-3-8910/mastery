@@ -165,7 +165,7 @@ public class EmployeeControllerIntegrationTest {
                 status().isNotFound()));
 
         assertEquals(3, employeeService.count());
-        assertEquals("Employee was not found in database", errorMessage.getInfo());
+        assertEquals("Employee id: 99 was not found in database", errorMessage.getInfo());
     }
 
     @Test
