@@ -62,7 +62,7 @@ class EmployeeDaoTest {
     public void shouldReturnExceptionWithUnknownEmployeeId() {
         LOGGER.debug("shouldReturnExceptionWithUnknownEmployeeId()");
         Exception exception = assertThrows(NotFoundMasteryException.class, () -> employeeDao.getEmployeeById(99));
-        assertEquals("Employee id:99 was not found in database", exception.getMessage());
+        assertEquals("Employee id: 99 was not found in database", exception.getMessage());
     }
 
     @Test
@@ -109,6 +109,7 @@ class EmployeeDaoTest {
     public void shouldDeleteEmployee() {
         LOGGER.debug("shouldDeleteEmployee()");
         Integer employeesCountBefore = employeeDao.getEmployeesCount();
+        employeeDao.deleteEmployee(3);
         assertEquals(employeesCountBefore - 1, employeeDao.getEmployeesCount());
     }
 
