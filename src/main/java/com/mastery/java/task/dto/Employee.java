@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,6 +16,7 @@ import java.util.Objects;
  * @author Sergey Tsynin
  * POJO Employee for model.
  */
+@ApiModel(description = "Represents an Employee in the system")
 @Entity
 @Table(name = "EMPLOYEE")
 public class Employee {
@@ -21,24 +24,31 @@ public class Employee {
     @Id
     @Column(name = "employee_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(accessMode = ApiModelProperty.AccessMode.READ_ONLY)
     private Integer id;
 
     @NotNull(message = "Employee firstname cannot be empty")
+    @ApiModelProperty(example = "Peter", required = true)
     private String firstName;
 
     @NotNull(message = "Employee lastname cannot be empty")
+    @ApiModelProperty(example = "Pan", required = true)
     private String lastName;
 
+    @ApiModelProperty(example = "42")
     private Integer departmentId;
 
+    @ApiModelProperty(example = "Pilot")
     private String jobTitle;
 
     @Enumerated(EnumType.STRING)
+    @ApiModelProperty(example = "MALE")
     private Gender gender;
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     @EmployeeAgeConstraint(message = "The employee must be over 18 years old")
+    @ApiModelProperty(notes = "The employee must be over 18 years old")
     private LocalDate dateOfBirth;
 
     /**
