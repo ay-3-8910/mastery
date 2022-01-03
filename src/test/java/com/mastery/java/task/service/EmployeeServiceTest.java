@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -48,6 +49,7 @@ class EmployeeServiceTest {
 
         //then
         assertEquals(base, employees);
+        verify(employeeDao).getAllEmployees();
     }
 
     @Test
@@ -55,14 +57,16 @@ class EmployeeServiceTest {
         LOGGER.debug("shouldFindById()");
 
         // given
-        Employee fakeEmployee = getFakeEmployee(1);
+        Integer interactionEmployeeId = 1;
+        Employee fakeEmployee = getFakeEmployee(interactionEmployeeId);
         when(employeeDao.getEmployeeById(1)).thenReturn(fakeEmployee);
 
         // when
-        Employee employee = employeeService.getEmployeeById(1);
+        Employee employee = employeeService.getEmployeeById(interactionEmployeeId);
 
         //then
         assertEquals(fakeEmployee, employee);
+        verify(employeeDao).getEmployeeById(interactionEmployeeId);
     }
 
     @Test
@@ -78,6 +82,7 @@ class EmployeeServiceTest {
 
         //then
         assertEquals(fakeEmployee, returnedEmployee);
+        verify(employeeDao).createEmployee(fakeEmployee);
     }
 
     @Test
@@ -93,6 +98,21 @@ class EmployeeServiceTest {
 
         //then
         assertEquals(fakeEmployee, returnedEmployee);
+        verify(employeeDao).updateEmployee(fakeEmployee);
+    }
+
+    @Test
+    void shouldDeleteEmployee() {
+        LOGGER.debug("shouldDeleteEmployee()");
+
+        // given
+        Integer interactionEmployeeId = 123;
+
+        // when
+        employeeService.deleteEmployee(interactionEmployeeId);
+
+        // then
+        verify(employeeDao).deleteEmployee(interactionEmployeeId);
     }
 
     @Test
@@ -100,13 +120,15 @@ class EmployeeServiceTest {
         LOGGER.debug("shouldReturnEmployeesCount()");
 
         // given
-        when(employeeDao.getEmployeesCount()).thenReturn(42);
+        Integer interactionEmployeeId = 42;
+        when(employeeDao.getEmployeesCount()).thenReturn(interactionEmployeeId);
 
         // when
         Integer employeesCount = employeeService.getEmployeesCount();
 
         //then
         assertEquals(42, employeesCount);
+        verify(employeeDao).getEmployeesCount();
     }
 
     private Employee getFakeEmployee(Integer id) {
