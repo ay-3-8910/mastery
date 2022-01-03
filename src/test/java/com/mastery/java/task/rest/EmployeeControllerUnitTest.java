@@ -58,6 +58,28 @@ class EmployeeControllerUnitTest {
     }
 
     @Test
+    void shouldReturnEmployeeById() throws Exception {
+        LOGGER.debug("shouldReturnEmployeeById()");
+
+        // given
+        Integer employeeToInteractionId = 42;
+        Employee employee = getFakeEmployee(employeeToInteractionId);
+        when(employeeService.getEmployeeById(employeeToInteractionId)).thenReturn(employee);
+
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(get(URI_ID, employeeToInteractionId)
+                .accept(MediaType.APPLICATION_JSON)
+
+        ) // then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertNotNull(servletResponse);
+        assertEquals(employee, extractEmployee(servletResponse));
+        verify(employeeService).getEmployeeById(employeeToInteractionId);
+    }
+
+    @Test
     public void shouldCreateEmployee() throws Exception {
         LOGGER.debug("shouldCreateEmployee()");
 
