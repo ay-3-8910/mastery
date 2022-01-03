@@ -2,6 +2,7 @@ package com.mastery.java.task.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mastery.java.task.dto.Employee;
+import com.mastery.java.task.dto.Gender;
 import com.mastery.java.task.service.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,12 +17,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,6 +55,32 @@ class EmployeeControllerUnitTest {
                 .standaloneSetup(employeeController)
                 .alwaysDo(print())
                 .build();
+    }
+
+    @Test
+    public void shouldUpdateEmployee() throws Exception {
+        LOGGER.debug("shouldUpdateEmployee()");
+
+        // given
+        Integer employeeToInteractionId = 256;
+        Employee newEmployee = getFakeEmployee(employeeToInteractionId);
+        String json = objectMapper.writeValueAsString(newEmployee);
+        when(employeeService.updateEmployee(newEmployee)).thenReturn(newEmployee);
+
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(put(URI_ID, 1, newEmployee)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .characterEncoding("utf-8")
+                .accept(MediaType.APPLICATION_JSON)
+
+        ) // then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertNotNull(servletResponse);
+        assertEquals(newEmployee, extractEmployee(servletResponse));
+        verify(employeeService).updateEmployee(newEmployee);
     }
 
     @Test
@@ -102,5 +130,17 @@ class EmployeeControllerUnitTest {
         return objectMapper.readValue(
                 servletResponse.getContentAsString(),
                 Employee.class);
+    }
+
+    private Employee getFakeEmployee(Integer id) {
+        Employee employee = new Employee();
+        employee.setEmployeeId(id);
+        employee.setFirstName("FirstName" + id);
+        employee.setLastName("LastName" + id);
+        employee.setDepartmentId(id);
+        employee.setJobTitle("JobTitle" + id);
+        employee.setGender(Gender.UNSPECIFIED);
+        employee.setDateOfBirth(LocalDate.now().minusYears(18));
+        return employee;
     }
 }
