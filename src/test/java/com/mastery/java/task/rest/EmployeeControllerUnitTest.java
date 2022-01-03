@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -55,6 +57,29 @@ class EmployeeControllerUnitTest {
                 .standaloneSetup(employeeController)
                 .alwaysDo(print())
                 .build();
+    }
+
+    @Test
+    public void shouldReturnEmployeesList() throws Exception {
+        LOGGER.debug("shouldReturnEmployeesList()");
+
+        // given
+        List<Employee> employees = new ArrayList<>();
+        employees.add(getFakeEmployee(1));
+        employees.add(getFakeEmployee(2));
+        when(employeeService.getAllEmployees()).thenReturn(employees);
+
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(get(URI)
+                .accept(MediaType.APPLICATION_JSON)
+
+        ) // then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertNotNull(servletResponse);
+        assertEquals(2, employees.size());
+        verify(employeeService).getAllEmployees();
     }
 
     @Test
