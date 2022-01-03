@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -34,6 +35,7 @@ class EmployeeControllerUnitTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeControllerUnitTest.class);
 
     private static final String URI = "/employees";
+    private static final String URI_ID = URI + "/{id}";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -51,6 +53,21 @@ class EmployeeControllerUnitTest {
                 .standaloneSetup(employeeController)
                 .alwaysDo(print())
                 .build();
+    }
+
+    @Test
+    void shouldDeleteEmployee() throws Exception {
+        LOGGER.info("shouldDeleteEmployee()");
+
+        // given
+        Integer employeeToInteractionId = 1;
+
+        // when
+        mockMvc.perform(delete(URI_ID, employeeToInteractionId)
+
+        ) // then
+                .andExpect(status().isNoContent());
+        verify(employeeService).deleteEmployee(employeeToInteractionId);
     }
 
     @Test
