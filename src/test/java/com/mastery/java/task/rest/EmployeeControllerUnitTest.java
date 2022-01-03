@@ -58,6 +58,34 @@ class EmployeeControllerUnitTest {
     }
 
     @Test
+    public void shouldCreateEmployee() throws Exception {
+        LOGGER.debug("shouldCreateEmployee()");
+
+        // given
+        Integer employeeToInteractionId = 128;
+        Employee newEmployee = getFakeEmployee(employeeToInteractionId);
+        Employee returnedEmployee = getFakeEmployee(employeeToInteractionId);
+        newEmployee.setEmployeeId(null);
+        String json = objectMapper.writeValueAsString(newEmployee);
+        when(employeeService.createEmployee(newEmployee)).thenReturn(returnedEmployee);
+
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(post(URI, newEmployee)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .characterEncoding("utf-8")
+                .accept(MediaType.APPLICATION_JSON)
+
+        ) // then
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertNotNull(servletResponse);
+        assertEquals(employeeToInteractionId, extractEmployee(servletResponse).getEmployeeId());
+        verify(employeeService).createEmployee(newEmployee);
+    }
+
+    @Test
     public void shouldUpdateEmployee() throws Exception {
         LOGGER.debug("shouldUpdateEmployee()");
 
