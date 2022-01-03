@@ -26,7 +26,7 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-    public EmployeeController(EmployeeService employeeService) {
+    public EmployeeController() {
         LOGGER.debug("Employees controller was created");
     }
 
@@ -79,7 +79,7 @@ public class EmployeeController {
      *
      * @param id employee Id.
      */
-    @DeleteMapping(value = "/{id}", produces = {"application/json"})
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEmployee(@PathVariable Integer id) {
         employeeService.deleteEmployee(id);
