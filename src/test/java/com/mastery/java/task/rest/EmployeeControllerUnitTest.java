@@ -1,5 +1,6 @@
 package com.mastery.java.task.rest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
@@ -79,6 +80,7 @@ class EmployeeControllerUnitTest {
                 .andReturn().getResponse();
         assertNotNull(servletResponse);
         assertEquals(2, employees.size());
+        assertEquals(employees, extractEmployeeList(servletResponse));
         verify(employeeService).getAllEmployees();
     }
 
@@ -205,6 +207,13 @@ class EmployeeControllerUnitTest {
         return objectMapper.readValue(
                 servletResponse.getContentAsString(),
                 Employee.class);
+    }
+
+    private List<Employee> extractEmployeeList(MockHttpServletResponse servletResponse) throws Exception {
+        return objectMapper.readValue(
+                servletResponse.getContentAsString(),
+                new TypeReference<>() {
+                });
     }
 
     private Employee getFakeEmployee(Integer id) {
