@@ -4,6 +4,7 @@ import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.rest.excepton_handling.NotFoundMasteryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -15,7 +16,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -54,13 +54,13 @@ public class EmployeeDao {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeDao.class);
 
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    @Autowired
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     RowMapper<Employee> rowMapper = BeanPropertyRowMapper.newInstance(Employee.class);
 
-    public EmployeeDao(DataSource dataSource) {
+    public EmployeeDao() {
         LOGGER.debug("Employees DAO was created");
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     public List<Employee> getAllEmployees() {
