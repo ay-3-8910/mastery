@@ -1,19 +1,17 @@
 package com.mastery.java.task.dao;
 
-import com.mastery.java.task.config.AppConfiguration;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
 import com.mastery.java.task.rest.excepton_handling.NotFoundMasteryException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,13 +21,12 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Sergey Tsynin
  */
-@DataJdbcTest
-@Import(EmployeeDao.class)
-@ContextConfiguration(classes = AppConfiguration.class)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Sql(scripts = {"classpath:db-schema.sql", "classpath:db-init.sql"},
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = EmployeeDaoTestConfig.class)
+@Sql(
+        scripts = {"classpath:db-schema.sql", "classpath:db-init.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@PropertySource({"classpath:sql.properties"})
+@TestPropertySource({"classpath:sql.properties", "classpath:application.properties"})
 class EmployeeDaoTest {
 
     @Autowired
