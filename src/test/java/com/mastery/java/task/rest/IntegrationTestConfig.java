@@ -10,6 +10,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.TransactionStatus;
 
 import javax.sql.DataSource;
 
@@ -35,6 +39,26 @@ public class IntegrationTestConfig {
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    PlatformTransactionManager platformTransactionManager() {
+        return new PlatformTransactionManager() {
+            @Override
+            public TransactionStatus getTransaction(TransactionDefinition transactionDefinition) throws TransactionException {
+                return null;
+            }
+
+            @Override
+            public void commit(TransactionStatus transactionStatus) throws TransactionException {
+
+            }
+
+            @Override
+            public void rollback(TransactionStatus transactionStatus) throws TransactionException {
+
+            }
+        };
     }
 
     @Bean
