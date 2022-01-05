@@ -79,7 +79,7 @@ class EmployeeControllerUnitTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
         assertNotNull(servletResponse);
-        assertEquals(2, employees.size());
+        assertEquals(2, extractEmployeeList(servletResponse).size());
         assertEquals(employees, extractEmployeeList(servletResponse));
         verify(employeeService).getAllEmployees();
     }
