@@ -4,20 +4,24 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
+import com.mastery.java.task.rest.excepton_handling.CustomExceptionHandler;
 import com.mastery.java.task.rest.excepton_handling.EmployeeErrorMessage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,47 +30,72 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author Sergey Tsynin
  */
-@WebMvcTest(controllers = EmployeeController.class)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ComponentScan(basePackages = "com.mastery.java.task")
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = IntegrationTestConfig.class)
 @Sql(scripts = {"classpath:db-schema.sql", "classpath:db-init.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@TestPropertySource({"classpath:sql.properties", "classpath:application.properties"})
 public class EmployeeControllerIntegrationTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeControllerIntegrationTest.class);
 
     private static final String URI = "/employees";
+    private static final String URI_ID = URI + "/{id}";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final MockMvcEmployeeService employeeService = new MockMvcEmployeeService();
 
-    @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
     private EmployeeController employeeController;
+
+    @BeforeEach
+    void setup() {
+        this.mockMvc = MockMvcBuilders
+                .standaloneSetup(employeeController)
+                .setControllerAdvice(new CustomExceptionHandler())
+                .alwaysDo(print())
+                .build();
+    }
 
     @Test
     public void shouldReturnEmployeesList() throws Exception {
         LOGGER.debug("shouldReturnEmployeesList()");
 
-        List<Employee> employees = employeeService.findAll();
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(get(URI)
+                .accept(MediaType.APPLICATION_JSON)
 
-        assertNotNull(employees);
-        assertEquals(3, employees.size());
+        ) // then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertNotNull(servletResponse);
+        assertEquals(3, extractEmployeeList(servletResponse).size());
     }
 
     @Test
     public void shouldReturnEmployeeById() throws Exception {
         LOGGER.debug("shouldReturnEmployeeById()");
-        Integer id = 2;
 
-        Employee employee = employeeService.findById(id);
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(get(URI_ID, 2)
+                .accept(MediaType.APPLICATION_JSON)
+
+        ) // then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertNotNull(servletResponse);
+        Employee employee = extractEmployee(servletResponse);
         assertEquals(2, employee.getEmployeeId());
         assertEquals("Rudolph", employee.getFirstName());
         assertEquals("the Deer", employee.getLastName());
@@ -222,7 +251,12 @@ public class EmployeeControllerIntegrationTest {
     @Test
     public void shouldDeleteEmployee() throws Exception {
         LOGGER.debug("shouldDeleteEmployee()");
-        employeeService.delete(2, status().isNoContent(), jsonPath("$").doesNotExist());
+
+        // when
+        mockMvc.perform(delete(URI_ID, 2)
+
+        ) // then
+                .andExpect(status().isNoContent());
         assertEquals(2, employeeService.count());
     }
 
@@ -286,6 +320,13 @@ public class EmployeeControllerIntegrationTest {
                 Integer.class);
     }
 
+    private List<Employee> extractEmployeeList(MockHttpServletResponse servletResponse) throws Exception {
+        return objectMapper.readValue(
+                servletResponse.getContentAsString(),
+                new TypeReference<>() {
+                });
+    }
+
     private EmployeeErrorMessage extractErrorMessage(MockHttpServletResponse response) throws Exception {
         return objectMapper.readValue(
                 response.getContentAsString(),
@@ -293,15 +334,6 @@ public class EmployeeControllerIntegrationTest {
     }
 
     private class MockMvcEmployeeService {
-
-        public List<Employee> findAll() throws Exception {
-            MockHttpServletResponse servletResponse = executeGetMethod(URI + "/", status().isOk());
-            assertNotNull(servletResponse);
-            return objectMapper.readValue(
-                    servletResponse.getContentAsString(),
-                    new TypeReference<>() {
-                    });
-        }
 
         public Employee findById(Integer id) throws Exception {
             return extractEmployee(read(id, status().isOk()));
