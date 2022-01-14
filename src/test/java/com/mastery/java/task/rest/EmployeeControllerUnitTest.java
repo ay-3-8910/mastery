@@ -212,7 +212,7 @@ class EmployeeControllerUnitTest {
     private List<Employee> extractEmployeeList(MockHttpServletResponse servletResponse) throws Exception {
         return objectMapper.readValue(
                 servletResponse.getContentAsString(),
-                new TypeReference<>() {
+                new TypeReference<List<Employee>>() {
                 });
     }
 
