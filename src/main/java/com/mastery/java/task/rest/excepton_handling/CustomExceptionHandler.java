@@ -20,29 +20,30 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public EmployeeErrorMessage handleNotFoundException(NotFoundMasteryException exception) {
-        LOGGER.error(exception.getMessage()); //??
-        return new EmployeeErrorMessage(exception);
+    public String handleNotFoundException(NotFoundMasteryException exception) {
+        String message = exception.getMessage();
+        LOGGER.error(message);
+        return message;
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public EmployeeErrorMessage handleValidationsErrors(MethodArgumentNotValidException exception) {
+    public String handleValidationsErrors(MethodArgumentNotValidException exception) {
         LOGGER.error(exception.getMessage());
-        return new EmployeeErrorMessage(exception.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        return exception.getBindingResult().getAllErrors().get(0).getDefaultMessage();
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public EmployeeErrorMessage handleConstraintViolationException(ConstraintViolationException exception) {
+    public String handleConstraintViolationException(ConstraintViolationException exception) {
         LOGGER.error(exception.getMessage());
-        return new EmployeeErrorMessage("Validation error.");
+        return "Validation error.";
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public EmployeeErrorMessage handleUnknownExceptions(Exception exception) {
-        LOGGER.error(exception.getMessage());
-        return new EmployeeErrorMessage("Wow! Happened unknown error!");
+    public String handleUnknownExceptions(Exception exception) {
+        LOGGER.error(exception.getMessage(), exception);
+        return "Wow! Happened unknown error!";
     }
 }
