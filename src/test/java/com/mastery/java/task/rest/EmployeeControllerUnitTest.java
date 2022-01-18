@@ -5,19 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
 import com.mastery.java.task.service.EmployeeService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,14 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author Sergey Tsynin
  */
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(EmployeeController.class)
 class EmployeeControllerUnitTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeControllerUnitTest.class);
@@ -45,21 +40,11 @@ class EmployeeControllerUnitTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @InjectMocks
-    private EmployeeController employeeController;
-
-    @Mock
+    @MockBean
     private EmployeeService employeeService;
-
-    @BeforeEach
-    void setup() {
-        this.mockMvc = MockMvcBuilders
-                .standaloneSetup(employeeController)
-                .alwaysDo(print())
-                .build();
-    }
 
     @Test
     public void shouldReturnEmployeesList() throws Exception {
