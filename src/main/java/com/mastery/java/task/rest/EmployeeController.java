@@ -44,7 +44,10 @@ public class EmployeeController {
     @ApiResponse(code = 200, message = "Employees list")
     @GetMapping(produces = {"application/json"})
     public List<Employee> getAllEmployees() {
-        return employeeService.getAllEmployees();
+        LOGGER.info(" IN: getAllEmployees() - []");
+        var employees = employeeService.getAllEmployees();
+        LOGGER.info("OUT: getAllEmployees() - found {} employee(s)", employees.size());
+        return employees;
     }
 
     /**
@@ -61,7 +64,10 @@ public class EmployeeController {
     })
     @GetMapping(value = "/{id}", produces = {"application/json"})
     public Employee getEmployeeById(@PathVariable @Min(1) Integer id) {
-        return employeeService.getEmployeeById(id);
+        LOGGER.info(" IN: getEmployeeById() - [{}]", id);
+        var employee = employeeService.getEmployeeById(id);
+        LOGGER.info("OUT: getEmployeeById() - [{}]", employee);
+        return employee;
     }
 
     /**
@@ -75,7 +81,10 @@ public class EmployeeController {
     @PostMapping(consumes = {"application/json"}, produces = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
     public Employee createEmployee(@Valid @RequestBody Employee employee) {
-        return employeeService.createEmployee(employee);
+        LOGGER.info(" IN: createEmployee() - [{}]", employee);
+        var employeeReturn = employeeService.createEmployee(employee);
+        LOGGER.info("OUT: createEmployee() - [{}]", employeeReturn);
+        return employeeReturn;
     }
 
     /**
@@ -92,7 +101,10 @@ public class EmployeeController {
     })
     @PutMapping(value = "/{id}", consumes = {"application/json"}, produces = {"application/json"})
     public Employee updateEmployee(@PathVariable Integer id, @Valid @RequestBody Employee employee) {
-        return employeeService.updateEmployee(employee);
+        LOGGER.info(" IN: updateEmployee() - [{}]", employee);
+        var employeeReturn = employeeService.updateEmployee(employee);
+        LOGGER.info("OUT: updateEmployee() - [{}]", employeeReturn);
+        return employeeReturn;
     }
 
     /**
@@ -105,7 +117,9 @@ public class EmployeeController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEmployee(@PathVariable Integer id) {
+        LOGGER.info(" IN: deleteEmployee() - [{}]", id);
         employeeService.deleteEmployee(id);
+        LOGGER.info("OUT: deleteEmployee() - [{}] - deleted", id);
     }
 
     /**
@@ -115,6 +129,9 @@ public class EmployeeController {
      */
     @GetMapping(value = "/count", produces = {"application/json"})
     public Integer getEmployeesCount() {
-        return employeeService.getEmployeesCount();
+        LOGGER.info(" IN: getEmployeesCount() - []");
+        var count = employeeService.getEmployeesCount();
+        LOGGER.info("OUT: getEmployeesCount() - found {} employee(s)", count);
+        return count;
     }
 }
