@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
-import com.mastery.java.task.rest.excepton_handling.EmployeeErrorMessage;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,11 +36,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ComponentScan(basePackages = "com.mastery.java.task")
 @Sql(scripts = {"classpath:db-schema.sql", "classpath:db-init.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class EmployeeControllerIntegrationTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeControllerIntegrationTest.class);
 
     private static final String URI = "/employees";
+    private static final String URI_ID = URI + "/{id}";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -49,24 +51,42 @@ public class EmployeeControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private EmployeeController employeeController;
-
     @Test
+    @Order(1)
     public void shouldReturnEmployeesList() throws Exception {
         LOGGER.debug("shouldReturnEmployeesList()");
 
-        List<Employee> employees = employeeService.findAll();
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(get(URI)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
 
-        assertNotNull(employees);
-        assertEquals(3, employees.size());
+                // then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        assertNotNull(servletResponse);
+        assertEquals(3, extractEmployeeList(servletResponse).size());
     }
 
     @Test
+    @Order(2)
     public void shouldReturnEmployeeById() throws Exception {
         LOGGER.debug("shouldReturnEmployeeById()");
-        Integer id = 2;
 
-        Employee employee = employeeService.findById(id);
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(get(URI_ID, 2)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+
+                // then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertNotNull(servletResponse);
+        Employee employee = extractEmployee(servletResponse);
+
         assertEquals(2, employee.getEmployeeId());
         assertEquals("Rudolph", employee.getFirstName());
         assertEquals("the Deer", employee.getLastName());
@@ -77,189 +97,331 @@ public class EmployeeControllerIntegrationTest {
     }
 
     @Test
+    @Order(3)
     public void shouldReturn404WithTryToFindUnknownId() throws Exception {
         LOGGER.debug("shouldReturn404WithTryToFindUnknownId()");
-        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.read(999, status().isNotFound()));
 
-        assertNotNull(errorMessage);
-        assertEquals("Employee id: 999 was not found in database", errorMessage.getInfo());
+        // when
+        mockMvc.perform(get(URI_ID, 999)
+                        .accept(MediaType.ALL)
+                ).andDo(print())
+
+                // then
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("Employee id: 999 was not found in database"));
     }
 
     @Test
+    @Order(4)
+    public void shouldReturn400InCaseZeroIdWithGetMethod() throws Exception {
+        LOGGER.debug("shouldReturn400InCaseZeroIdWithGetMethod()");
+
+        // when
+        mockMvc.perform(get(URI_ID, 0)
+                        .accept(MediaType.ALL)
+                ).andDo(print())
+
+                // then
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("Validation error."));
+    }
+
+    @Test
+    @Order(5)
     public void shouldCreateEmployee() throws Exception {
         LOGGER.debug("shouldCreateEmployee()");
-        Employee newEmployee = getFakeEmployee(128);
 
-        Employee returnedEmployee = extractEmployee(employeeService.create(
-                newEmployee,
-                status().isCreated()));
+        // given
+        Integer employeeToInteractionId = 4;
+        Employee newEmployee = getFakeEmployee(employeeToInteractionId);
+        newEmployee.setEmployeeId(null);
+        String json = objectMapper.writeValueAsString(newEmployee);
 
-        newEmployee.setEmployeeId(4);
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(post(URI, newEmployee)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .characterEncoding("utf-8")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+
+                // then
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertNotNull(servletResponse);
+        assertEquals(employeeToInteractionId, extractEmployee(servletResponse).getEmployeeId());
         assertEquals(4, employeeService.count());
-        assertEquals(newEmployee, returnedEmployee);
-        assertEquals(newEmployee, employeeService.findById(returnedEmployee.getEmployeeId()));
     }
 
     @Test
+    @Order(6)
     public void shouldReturn400IfCreateTooYoungEmployee() throws Exception {
         LOGGER.debug("shouldReturn400IfCreateTooYoungEmployee()");
+
+        // given
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setDateOfBirth(LocalDate.now());
+        String json = objectMapper.writeValueAsString(newEmployee);
 
-        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.create(
-                newEmployee,
-                status().isBadRequest()));
+        // when
+        mockMvc.perform(post(URI, newEmployee)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .characterEncoding("utf-8")
+                        .accept(MediaType.ALL))
+                .andDo(print())
 
-        assertNotNull(errorMessage);
-        assertEquals("The employee must be over 18 years old", errorMessage.getInfo());
+                // then
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("The employee must be over 18 years old"));
+
+        assertEquals(3, employeeService.count());
     }
 
     @Test
+    @Order(7)
     public void shouldReturn400IfCreateEmployeeWithNullFirstName() throws Exception {
         LOGGER.debug("shouldReturn400IfCreateEmployeeWithNullFirstName()");
+
+        // given
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setFirstName(null);
+        String json = objectMapper.writeValueAsString(newEmployee);
 
-        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.create(
-                newEmployee,
-                status().isBadRequest()));
+        // when
+        mockMvc.perform(post(URI, newEmployee)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .characterEncoding("utf-8")
+                        .accept(MediaType.ALL))
+                .andDo(print())
 
-        assertNotNull(errorMessage);
-        assertEquals("Employee firstname cannot be empty", errorMessage.getInfo());
+                // then
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("Employee firstname cannot be empty"));
+
+        assertEquals(3, employeeService.count());
     }
 
     @Test
+    @Order(8)
     public void shouldReturn400IfCreateEmployeeWithNullLastName() throws Exception {
         LOGGER.debug("shouldReturn400IfCreateEmployeeWithNullLastName()");
+
+        // given
         Employee newEmployee = getFakeEmployee(128);
         newEmployee.setLastName(null);
-        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.create(
-                newEmployee,
-                status().isBadRequest()));
+        String json = objectMapper.writeValueAsString(newEmployee);
 
-        assertNotNull(errorMessage);
-        assertEquals("Employee lastname cannot be empty", errorMessage.getInfo());
+        // when
+        mockMvc.perform(post(URI, newEmployee)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .characterEncoding("utf-8")
+                        .accept(MediaType.ALL))
+                .andDo(print())
+
+                // then
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("Employee lastname cannot be empty"));
+
+        assertEquals(3, employeeService.count());
     }
 
     @Test
+    @Order(9)
     public void shouldUpdateEmployee() throws Exception {
         LOGGER.debug("shouldUpdateEmployee()");
+
+        // given
         Integer id = 2;
         Employee employee = getFakeEmployee(id);
+        String json = objectMapper.writeValueAsString(employee);
 
-        extractEmployee(employeeService.update(id, employee, status().isOk()));
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(put(URI_ID, id, employee)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .characterEncoding("utf-8")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
 
-        assertEquals(3, employeeService.count());
+                // then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertNotNull(servletResponse);
+        Employee returnedEmployee = extractEmployee(servletResponse);
+        assertEquals(employee, returnedEmployee);
         assertEquals(employee, employeeService.findById(id));
+        assertEquals(3, employeeService.count());
     }
 
     @Test
+    @Order(10)
     public void shouldReturn404IfUpdateEmployeeWithUnknownId() throws Exception {
         LOGGER.debug("shouldReturn404IfUpdateEmployeeWithUnknownId()");
+
+        // given
         Integer id = 99;
         Employee employee = getFakeEmployee(id);
+        String json = objectMapper.writeValueAsString(employee);
 
-        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
-                id,
-                employee,
-                status().isNotFound()));
+        // when
+        mockMvc.perform(put(URI_ID, id, employee)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .characterEncoding("utf-8")
+                        .accept(MediaType.ALL))
+                .andDo(print())
+
+                // then
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("Employee id: 99 was not found in database"));
 
         assertEquals(3, employeeService.count());
-        assertEquals("Employee id: 99 was not found in database", errorMessage.getInfo());
     }
 
     @Test
+    @Order(11)
     public void shouldReturn400IfUpdateEmployeeWithNullFirstName() throws Exception {
         LOGGER.debug("shouldReturn400IfUpdateEmployeeWithNullFirstName()");
+
+        // given
         Integer id = 2;
-        Employee employee = employeeService.findById(id);
-
+        Employee employee = getFakeEmployee(id);
         employee.setFirstName(null);
-        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
-                id,
-                employee,
-                status().isBadRequest()));
-        assertEquals(3, employeeService.count());
+        String json = objectMapper.writeValueAsString(employee);
 
-        assertNotNull(errorMessage);
-        assertEquals("Employee firstname cannot be empty", errorMessage.getInfo());
+        // when
+        mockMvc.perform(put(URI_ID, id, employee)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .characterEncoding("utf-8")
+                        .accept(MediaType.ALL))
+                .andDo(print())
+
+                // then
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("Employee firstname cannot be empty"));
+
+        assertEquals(3, employeeService.count());
     }
 
     @Test
+    @Order(12)
     public void shouldReturn400IfUpdateEmployeeWithNullLastName() throws Exception {
         LOGGER.debug("shouldReturn400IfUpdateEmployeeWithNullLastName()");
+
+        // given
         Integer id = 2;
-        Employee employee = employeeService.findById(id);
-
+        Employee employee = getFakeEmployee(id);
         employee.setLastName(null);
-        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
-                id,
-                employee,
-                status().isBadRequest()));
-        assertEquals(3, employeeService.count());
+        String json = objectMapper.writeValueAsString(employee);
 
-        assertNotNull(errorMessage);
-        assertEquals("Employee lastname cannot be empty", errorMessage.getInfo());
+        // when
+        mockMvc.perform(put(URI_ID, id, employee)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .characterEncoding("utf-8")
+                        .accept(MediaType.ALL))
+                .andDo(print())
+
+                // then
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("Employee lastname cannot be empty"));
+
+        assertEquals(3, employeeService.count());
     }
 
     @Test
+    @Order(13)
     public void shouldReturn400IfUpdateEmployeeWithLowAge() throws Exception {
         LOGGER.debug("shouldReturn400IfUpdateEmployeeWithLowAge()");
         Integer id = 2;
-        Employee employee = employeeService.findById(id);
-
+        Employee employee = getFakeEmployee(id);
         employee.setDateOfBirth(LocalDate.now());
-        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.update(
-                id,
-                employee,
-                status().isBadRequest()));
-        assertEquals(3, employeeService.count());
+        String json = objectMapper.writeValueAsString(employee);
 
-        assertNotNull(errorMessage);
-        assertEquals("The employee must be over 18 years old", errorMessage.getInfo());
+        // when
+        mockMvc.perform(put(URI_ID, id, employee)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .characterEncoding("utf-8")
+                        .accept(MediaType.ALL))
+                .andDo(print())
+
+                // then
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("The employee must be over 18 years old"));
+
+        assertEquals(3, employeeService.count());
     }
 
     @Test
+    @Order(14)
     public void shouldDeleteEmployee() throws Exception {
         LOGGER.debug("shouldDeleteEmployee()");
-        employeeService.delete(2, status().isNoContent(), jsonPath("$").doesNotExist());
+
+        // when
+        mockMvc.perform(delete(URI_ID, 2)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL))
+                .andDo(print())
+
+                // then
+                .andExpect(status().isNoContent())
+                .andExpect(jsonPath("$").doesNotExist());
+
         assertEquals(2, employeeService.count());
     }
 
     @Test
+    @Order(15)
     public void shouldReturn404ForDeleteEmployeeWithWrongId() throws Exception {
         LOGGER.debug("shouldReturn404ForDeleteEmployeeWithWrongId");
-        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.delete(
-                999,
-                status().isNotFound(),
-                content().contentType("application/json")));
 
-        assertNotNull(errorMessage);
-        assertEquals("Employee id: 999 was not found in database", errorMessage.getInfo());
+        // when
+        mockMvc.perform(delete(URI_ID, 99)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL))
+                .andDo(print())
+
+                // then
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Employee id: 99 was not found in database"));
 
         assertEquals(3, employeeService.count());
     }
 
     @Test
+    @Order(16)
     public void shouldReturnEmployeesCount() throws Exception {
         LOGGER.debug("shouldReturnEmployeesCount()");
 
-        Integer employeesCount = employeeService.count();
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(get(URI + "/count")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
 
+                // then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertNotNull(servletResponse);
+        Integer employeesCount = extractInteger(servletResponse);
         assertNotNull(employeesCount);
         assertEquals(3, employeesCount);
-    }
-
-    @Test
-    public void shouldReturn400InCaseInvalidIdWithGetMethod() throws Exception {
-        LOGGER.debug("shouldReturn400InCaseInvalidIdWithGetMethod()");
-
-        EmployeeErrorMessage errorMessage = extractErrorMessage(employeeService.read(
-                0,
-                status().isBadRequest()));
-
-        assertNotNull(errorMessage);
-        assertEquals("Validation error.", errorMessage.getInfo());
     }
 
     private Employee getFakeEmployee(Integer id) {
@@ -280,122 +442,27 @@ public class EmployeeControllerIntegrationTest {
                 Employee.class);
     }
 
+    private List<Employee> extractEmployeeList(MockHttpServletResponse servletResponse) throws Exception {
+        return objectMapper.readValue(
+                servletResponse.getContentAsString(),
+                new TypeReference<>() {
+                });
+    }
+
     private Integer extractInteger(MockHttpServletResponse servletResponse) throws Exception {
         return objectMapper.readValue(
                 servletResponse.getContentAsString(),
                 Integer.class);
     }
 
-    private EmployeeErrorMessage extractErrorMessage(MockHttpServletResponse response) throws Exception {
-        return objectMapper.readValue(
-                response.getContentAsString(),
-                EmployeeErrorMessage.class);
-    }
-
     private class MockMvcEmployeeService {
 
-        public List<Employee> findAll() throws Exception {
-            MockHttpServletResponse servletResponse = executeGetMethod(URI + "/", status().isOk());
-            assertNotNull(servletResponse);
-            return objectMapper.readValue(
-                    servletResponse.getContentAsString(),
-                    new TypeReference<>() {
-                    });
-        }
-
         public Employee findById(Integer id) throws Exception {
-            return extractEmployee(read(id, status().isOk()));
-        }
-
-        public MockHttpServletResponse read(Integer id,
-                                            ResultMatcher expectedStatus) throws Exception {
-            MockHttpServletResponse servletResponse = executeGetMethod(URI + "/" + id, expectedStatus);
-            assertNotNull(servletResponse);
-            return servletResponse;
-        }
-
-        public MockHttpServletResponse create(Employee employee,
-                                              ResultMatcher expectedStatus) throws Exception {
-            String json = objectMapper.writeValueAsString(employee);
-            MockHttpServletResponse servletResponse = executePostMethod(
-                    json,
-                    expectedStatus,
-                    content().contentType("application/json"));
-            assertNotNull(servletResponse);
-            return servletResponse;
-        }
-
-        public MockHttpServletResponse update(Integer id,
-                                              Employee employee,
-                                              ResultMatcher expectedStatus) throws Exception {
-            String json = objectMapper.writeValueAsString(employee);
-            MockHttpServletResponse servletResponse = executePutMethod(
-                    id,
-                    json,
-                    expectedStatus);
-            assertNotNull(servletResponse);
-            return servletResponse;
-        }
-
-        public MockHttpServletResponse delete(Integer id,
-                                              ResultMatcher expectedStatus,
-                                              ResultMatcher expectedContent) throws Exception {
-            MockHttpServletResponse servletResponse = executeDeleteMethod(
-                    id,
-                    expectedStatus,
-                    expectedContent);
-            assertNotNull(servletResponse);
-            return servletResponse;
+            return extractEmployee(mockMvc.perform(get(URI_ID, id)).andReturn().getResponse());
         }
 
         public Integer count() throws Exception {
-            MockHttpServletResponse servletResponse = executeGetMethod(URI + "/count", status().isOk());
-            assertNotNull(servletResponse);
-            return extractInteger(servletResponse);
-        }
-
-        private MockHttpServletResponse executeGetMethod(String urlTemplate, ResultMatcher expectedStatus) throws Exception {
-            return mockMvc.perform(get(urlTemplate)
-            ).andDo(print())
-                    .andExpect(expectedStatus)
-                    .andExpect(content().contentType("application/json"))
-                    .andReturn().getResponse();
-        }
-
-        private MockHttpServletResponse executePostMethod(String json,
-                                                          ResultMatcher expectedStatus,
-                                                          ResultMatcher expectedContent) throws Exception {
-            return mockMvc.perform(post(URI)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json)
-                    .accept(MediaType.APPLICATION_JSON)
-            ).andDo(print())
-                    .andExpect(expectedStatus)
-                    .andExpect(expectedContent)
-                    .andReturn().getResponse();
-        }
-
-        private MockHttpServletResponse executePutMethod(Integer id,
-                                                         String json,
-                                                         ResultMatcher expectedStatus) throws Exception {
-            return mockMvc.perform(put(URI + "/" + id)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json)
-                    .accept(MediaType.APPLICATION_JSON)
-            ).andDo(print())
-                    .andExpect(expectedStatus)
-                    .andReturn().getResponse();
-        }
-
-        private MockHttpServletResponse executeDeleteMethod(Integer id,
-                                                            ResultMatcher expectedStatus,
-                                                            ResultMatcher expectedContent) throws Exception {
-            return mockMvc.perform(
-                    MockMvcRequestBuilders.delete(URI + "/" + id)
-            ).andDo(print())
-                    .andExpect(expectedStatus)
-                    .andExpect(expectedContent)
-                    .andReturn().getResponse();
+            return extractInteger(mockMvc.perform(get(URI + "/count")).andReturn().getResponse());
         }
     }
 }
