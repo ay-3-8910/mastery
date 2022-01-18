@@ -2,6 +2,10 @@ package com.mastery.java.task.rest;
 
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.service.EmployeeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,7 @@ import java.util.List;
 @Validated
 @RestController
 @RequestMapping("employees")
+@Api(value = "employee", tags = "employee")
 public class EmployeeController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeController.class);
@@ -35,6 +40,8 @@ public class EmployeeController {
      *
      * @return Employees list.
      */
+    @ApiOperation(value = "Get all employees list", tags = "employee")
+    @ApiResponse(code = 200, message = "Employees list")
     @GetMapping(produces = {"application/json"})
     public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
@@ -46,6 +53,12 @@ public class EmployeeController {
      * @param id employee Id.
      * @return employee.
      */
+    @ApiOperation(value = "Get one employee by id", tags = "employee")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Employee"),
+            @ApiResponse(code = 400, message = "Validation error"),
+            @ApiResponse(code = 404, message = "Employee not found")
+    })
     @GetMapping(value = "/{id}", produces = {"application/json"})
     public Employee getEmployeeById(@PathVariable @Min(1) Integer id) {
         return employeeService.getEmployeeById(id);
@@ -57,6 +70,8 @@ public class EmployeeController {
      * @param employee object.
      * @return saved employee.
      */
+    @ApiOperation(value = "Add a new employee", tags = "employee")
+    @ApiResponse(code = 400, message = "Validation error")
     @PostMapping(consumes = {"application/json"}, produces = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
     public Employee createEmployee(@Valid @RequestBody Employee employee) {
@@ -69,6 +84,12 @@ public class EmployeeController {
      * @param employee object.
      * @return updated employee.
      */
+    @ApiOperation(value = "Update an existing employee", tags = "employee")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Updated employee"),
+            @ApiResponse(code = 400, message = "Validation error"),
+            @ApiResponse(code = 404, message = "Employee not found")
+    })
     @PutMapping(value = "/{id}", consumes = {"application/json"}, produces = {"application/json"})
     public Employee updateEmployee(@PathVariable Integer id, @Valid @RequestBody Employee employee) {
         return employeeService.updateEmployee(employee);
@@ -79,7 +100,9 @@ public class EmployeeController {
      *
      * @param id employee Id.
      */
-    @DeleteMapping(value = "/{id}", produces = {"application/json"})
+    @ApiOperation(value = "Delete employee by id", tags = "employee")
+    @ApiResponse(code = 404, message = "Employee not found")
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEmployee(@PathVariable Integer id) {
         employeeService.deleteEmployee(id);
