@@ -73,16 +73,16 @@ public class EmployeeController {
     /**
      * Get employees by firstname and lastname.
      *
-     * @param firstName employee lastname.
+     * @param firstName employee firstname.
      * @param lastName  employee lastname.
      * @return employee.
      */
     @ApiOperation(value = "Get employees by firstname and lastname", tags = "employee")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Employees"),
+            @ApiResponse(code = 200, message = "Employees list"),
             @ApiResponse(code = 404, message = "Employees not found")
     })
-    @GetMapping(value = "/search/", produces = {"application/json"})
+    @GetMapping(value = "/search", produces = {"application/json"})
     public List<Employee> getEmployeesByName(@RequestParam(value = "firstName", defaultValue = "") String firstName,
                                              @RequestParam(value = "lastName", defaultValue = "") String lastName) {
         LOGGER.info(" IN: getEmployeeByName() - [{}, {}]", firstName, lastName);
