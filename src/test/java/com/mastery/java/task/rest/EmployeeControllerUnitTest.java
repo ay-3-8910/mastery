@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -90,6 +91,31 @@ class EmployeeControllerUnitTest {
         assertNotNull(servletResponse);
         assertEquals(employee, extractEmployee(servletResponse));
         verify(employeeService).getEmployeeById(employeeToInteractionId);
+    }
+
+    @Test
+    void shouldReturnEmployeeByName() throws Exception {
+        LOGGER.debug("shouldReturnEmployeeByName()");
+
+        // given
+        String firstName = "FirstName7";
+        String lastName = "LastName7";
+        List<Employee> employeesList = Collections.singletonList(getFakeEmployee(7));
+        when(employeeService.getEmployeesByName(firstName, lastName)).thenReturn(employeesList);
+
+        // when
+        MockHttpServletResponse servletResponse = mockMvc.perform(get(URI + "/search")
+                        .param("firstName", firstName)
+                        .param("lastName", lastName)
+                        .accept(MediaType.APPLICATION_JSON)
+
+                ) // then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        assertNotNull(servletResponse);
+        assertEquals(employeesList, extractEmployeeList(servletResponse));
+        verify(employeeService).getEmployeesByName(firstName, lastName);
     }
 
     @Test
