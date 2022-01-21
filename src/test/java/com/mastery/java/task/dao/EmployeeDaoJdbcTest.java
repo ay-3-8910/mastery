@@ -64,6 +64,17 @@ class EmployeeDaoJdbcTest {
     }
 
     @Test
+    public void shouldReturnEmployeeByName() {
+        LOGGER.debug("shouldReturnEmployeeByName()");
+
+        // when
+        List<Employee> employees = employeeDao.getEmployeesByName("a", "");
+
+        // then
+        assertEquals(2, employees.size());
+    }
+
+    @Test
     public void shouldReturnExceptionWithUnknownEmployeeId() {
         LOGGER.debug("shouldReturnExceptionWithUnknownEmployeeId()");
 

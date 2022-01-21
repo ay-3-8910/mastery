@@ -45,6 +45,10 @@ public class EmployeeDaoJdbc implements EmployeeDao {
     private String sqlGetEmployeeById;
 
     @SuppressWarnings("unused")
+    @Value("${sqlGetEmployeeByName}")
+    private String sqlGetEmployeeByName;
+
+    @SuppressWarnings("unused")
     @Value("${sqlCreateEmployee}")
     private String sqlCreateEmployee;
 
@@ -94,7 +98,19 @@ public class EmployeeDaoJdbc implements EmployeeDao {
 
     @Override
     public List<Employee> getEmployeesByName(String firstName, String lastName) {
-        return null;
+        MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
+        sqlParameterSource.addValue("FIRST_NAME", "%" + firstName + "%");
+        sqlParameterSource.addValue("LAST_NAME", "%" + lastName + "%");
+
+        List<Employee> employees = namedParameterJdbcTemplate.query(
+                sqlGetEmployeeByName,
+                sqlParameterSource,
+                rowMapper);
+
+        if (employees.isEmpty()) {
+            throw new ResourceNotFoundException("Nothing was found for these parameters");
+        }
+        return employees;
     }
 
     @Override
