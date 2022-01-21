@@ -71,6 +71,27 @@ public class EmployeeController {
     }
 
     /**
+     * Get employees by firstname and lastname.
+     *
+     * @param firstName employee lastname.
+     * @param lastName  employee lastname.
+     * @return employee.
+     */
+    @ApiOperation(value = "Get employees by firstname and lastname", tags = "employee")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Employees"),
+            @ApiResponse(code = 404, message = "Employees not found")
+    })
+    @GetMapping(value = "/search/", produces = {"application/json"})
+    public List<Employee> getEmployeesByName(@RequestParam(value = "firstName", defaultValue = "") String firstName,
+                                             @RequestParam(value = "lastName", defaultValue = "") String lastName) {
+        LOGGER.info(" IN: getEmployeeByName() - [{}, {}]", firstName, lastName);
+        var employees = employeeService.getEmployeesByName(firstName, lastName);
+        LOGGER.info("OUT: getEmployeeByName() - found {} employee(s)", employees.size());
+        return employees;
+    }
+
+    /**
      * Create new employee record.
      *
      * @param employee object.
@@ -127,6 +148,7 @@ public class EmployeeController {
      *
      * @return the number of employees in the database.
      */
+    @ApiOperation(value = "Get the number of employees in the database", tags = "employee")
     @GetMapping(value = "/count", produces = {"application/json"})
     public Integer getEmployeesCount() {
         LOGGER.info(" IN: getEmployeesCount() - []");

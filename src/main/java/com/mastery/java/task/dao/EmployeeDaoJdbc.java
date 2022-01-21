@@ -93,6 +93,11 @@ public class EmployeeDaoJdbc implements EmployeeDao {
     }
 
     @Override
+    public List<Employee> getEmployeesByName(String firstName, String lastName) {
+        return null;
+    }
+
+    @Override
     public Employee createEmployee(Employee employee) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 

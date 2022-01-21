@@ -13,6 +13,8 @@ public interface EmployeeDao {
 
     Employee getEmployeeById(Integer id);
 
+    List<Employee> getEmployeesByName(String firstName, String lastName);
+
     Employee createEmployee(Employee employee);
 
     Employee updateEmployee(Employee employee);

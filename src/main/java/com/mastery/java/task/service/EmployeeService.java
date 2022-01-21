@@ -28,11 +28,22 @@ public class EmployeeService {
     /**
      * Get employee by Id.
      *
-     * @param employeeId train Id.
+     * @param employeeId employee Id.
      * @return employee.
      */
     public Employee getEmployeeById(Integer employeeId) {
         return employeeDao.getEmployeeById(employeeId);
+    }
+
+    /**
+     * Get employee by firstname and lastname.
+     *
+     * @param firstName employee firstname.
+     * @param lastName  employee lastname.
+     * @return employee.
+     */
+    public List<Employee> getEmployeesByName(String firstName, String lastName) {
+        return employeeDao.getEmployeesByName(firstName, lastName);
     }
 
     /**

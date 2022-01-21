@@ -35,6 +35,16 @@ public class EmployeeDaoJpa implements EmployeeDao {
     }
 
     @Override
+    public List<Employee> getEmployeesByName(String firstName, String lastName) {
+        var employees = employeeJpaRepository
+                .findByFirstNameContainsAndLastNameContains(firstName, lastName);
+        if (employees.isEmpty()) {
+            throw new NotFoundMasteryException(65535);
+        }
+        return employees;
+    }
+
+    @Override
     public Employee createEmployee(Employee employee) {
         return employeeJpaRepository.save(employee);
     }
