@@ -20,7 +20,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleNotFoundException(NotFoundMasteryException exception) {
+    public String handleNotFoundException(ResourceNotFoundException exception) {
         String message = exception.getMessage();
         LOGGER.error(message);
         return message;

@@ -2,7 +2,7 @@ package com.mastery.java.task.dao;
 
 import com.mastery.java.task.dto.Employee;
 import com.mastery.java.task.dto.Gender;
-import com.mastery.java.task.rest.excepton_handling.NotFoundMasteryException;
+import com.mastery.java.task.rest.excepton_handling.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +68,7 @@ class EmployeeDaoJdbcTest {
         LOGGER.debug("shouldReturnExceptionWithUnknownEmployeeId()");
 
         // then
-        Exception exception = assertThrows(NotFoundMasteryException.class,
+        Exception exception = assertThrows(ResourceNotFoundException.class,
                 () -> employeeDao.getEmployeeById(99));
         assertEquals("Employee id: 99 was not found in database", exception.getMessage());
     }
@@ -118,7 +118,7 @@ class EmployeeDaoJdbcTest {
         Employee fakeEmployee = getFakeEmployee(128);
 
         // then
-        Exception exception = assertThrows(NotFoundMasteryException.class,
+        Exception exception = assertThrows(ResourceNotFoundException.class,
                 () -> employeeDao.updateEmployee(fakeEmployee));
         assertEquals("Employee id: 128 was not found in database", exception.getMessage());
         assertEquals(employeesCountBefore, employeeDao.getEmployeesCount());
@@ -143,7 +143,7 @@ class EmployeeDaoJdbcTest {
         LOGGER.debug("shouldReturnExceptionIfDeleteEmployeeWithUnknownId()");
 
         // then
-        Exception exception = assertThrows(NotFoundMasteryException.class,
+        Exception exception = assertThrows(ResourceNotFoundException.class,
                 () -> employeeDao.deleteEmployee(128));
         assertEquals("Employee id: 128 was not found in database", exception.getMessage());
     }

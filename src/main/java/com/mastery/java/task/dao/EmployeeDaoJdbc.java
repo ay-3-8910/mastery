@@ -1,7 +1,7 @@
 package com.mastery.java.task.dao;
 
 import com.mastery.java.task.dto.Employee;
-import com.mastery.java.task.rest.excepton_handling.NotFoundMasteryException;
+import com.mastery.java.task.rest.excepton_handling.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +87,7 @@ public class EmployeeDaoJdbc implements EmployeeDao {
         Optional<Employee> optionalEmployee = Optional.ofNullable(DataAccessUtils.uniqueResult(passengers));
 
         if (optionalEmployee.isEmpty()) {
-            throw new NotFoundMasteryException(id);
+            throw new ResourceNotFoundException(notFoundForThisIdMessage(id));
         }
         return optionalEmployee.get();
     }
@@ -119,7 +119,7 @@ public class EmployeeDaoJdbc implements EmployeeDao {
                 getParameterSource(employee),
                 keyHolder, new String[]{"employee_id"});
         if (keyHolder.getKey() == null) {
-            throw new NotFoundMasteryException(employee.getEmployeeId());
+            throw new ResourceNotFoundException(notFoundForThisIdMessage(employee.getEmployeeId()));
         }
         return employee;
     }
@@ -131,7 +131,7 @@ public class EmployeeDaoJdbc implements EmployeeDao {
                 new MapSqlParameterSource("EMPLOYEE_ID", id));
 
         if (numberOfDeletedEmployees == 0) {
-            throw new NotFoundMasteryException(id);
+            throw new ResourceNotFoundException(notFoundForThisIdMessage(id));
         }
     }
 
@@ -154,5 +154,9 @@ public class EmployeeDaoJdbc implements EmployeeDao {
                 addValue("GENDER", employee.getGender().name()).
                 addValue("DATE_OF_BIRTH", employee.getDateOfBirth());
         return parameterSource;
+    }
+
+    private String notFoundForThisIdMessage(Integer employeeId) {
+        return "Employee id: " + employeeId + " was not found in database";
     }
 }

@@ -1,7 +1,7 @@
 package com.mastery.java.task.dao;
 
 import com.mastery.java.task.dto.Employee;
-import com.mastery.java.task.rest.excepton_handling.NotFoundMasteryException;
+import com.mastery.java.task.rest.excepton_handling.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class EmployeeDaoJpa implements EmployeeDao {
     public Employee getEmployeeById(Integer employeeId) {
         return employeeJpaRepository.findById(employeeId)
                 .orElseThrow(() ->
-                        new NotFoundMasteryException(employeeId));
+                        new ResourceNotFoundException(notFoundForThisIdMessage(employeeId)));
     }
 
     @Override
@@ -39,7 +39,7 @@ public class EmployeeDaoJpa implements EmployeeDao {
         var employees = employeeJpaRepository
                 .findByFirstNameContainsAndLastNameContains(firstName, lastName);
         if (employees.isEmpty()) {
-            throw new NotFoundMasteryException(65535);
+            throw new ResourceNotFoundException("Nothing was found for these parameters");
         }
         return employees;
     }
@@ -53,7 +53,7 @@ public class EmployeeDaoJpa implements EmployeeDao {
     public Employee updateEmployee(Employee employee) {
         Integer employeeId = employee.getEmployeeId();
         if (!employeeJpaRepository.existsById(employeeId)) {
-            throw new NotFoundMasteryException(employeeId);
+            throw new ResourceNotFoundException(notFoundForThisIdMessage(employeeId));
         }
         return employeeJpaRepository.save(employee);
     }
@@ -61,7 +61,7 @@ public class EmployeeDaoJpa implements EmployeeDao {
     @Override
     public void deleteEmployee(Integer employeeId) {
         if (!employeeJpaRepository.existsById(employeeId)) {
-            throw new NotFoundMasteryException(employeeId);
+            throw new ResourceNotFoundException(notFoundForThisIdMessage(employeeId));
         }
         employeeJpaRepository.deleteById(employeeId);
     }
@@ -69,5 +69,9 @@ public class EmployeeDaoJpa implements EmployeeDao {
     @Override
     public Integer getEmployeesCount() {
         return Math.toIntExact(employeeJpaRepository.count());
+    }
+
+    private String notFoundForThisIdMessage(Integer employeeId) {
+        return "Employee id: " + employeeId + " was not found in database";
     }
 }
