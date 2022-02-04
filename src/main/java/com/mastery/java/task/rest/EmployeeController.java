@@ -1,6 +1,7 @@
 package com.mastery.java.task.rest;
 
 import com.mastery.java.task.dto.Employee;
+import com.mastery.java.task.rest.excepton_handling.IdMismatchException;
 import com.mastery.java.task.service.EmployeeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -123,6 +124,9 @@ public class EmployeeController {
     @PutMapping(value = "/{id}", consumes = {"application/json"}, produces = {"application/json"})
     public Employee updateEmployee(@PathVariable Integer id, @Valid @RequestBody Employee employee) {
         LOGGER.info(" IN: updateEmployee() - [{}]", employee);
+        if (!id.equals(employee.getEmployeeId())) {
+            throw new IdMismatchException("Id mismatch");
+        }
         var employeeReturn = employeeService.updateEmployee(employee);
         LOGGER.info("OUT: updateEmployee() - [{}]", employeeReturn);
         return employeeReturn;

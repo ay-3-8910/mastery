@@ -35,6 +35,13 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleValidationsErrors(IdMismatchException exception) {
+        LOGGER.error(exception.getMessage(), exception);
+        return exception.getMessage();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleConstraintViolationException(ConstraintViolationException exception) {
         LOGGER.error(exception.getMessage(), exception);
         return "Validation error.";

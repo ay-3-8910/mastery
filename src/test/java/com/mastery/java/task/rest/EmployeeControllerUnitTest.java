@@ -157,7 +157,7 @@ class EmployeeControllerUnitTest {
         when(employeeService.updateEmployee(newEmployee)).thenReturn(newEmployee);
 
         // when
-        MockHttpServletResponse servletResponse = mockMvc.perform(put(URI_ID, 1, newEmployee)
+        MockHttpServletResponse servletResponse = mockMvc.perform(put(URI_ID, 256, newEmployee)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .characterEncoding("utf-8")
@@ -170,6 +170,28 @@ class EmployeeControllerUnitTest {
         assertNotNull(servletResponse);
         assertEquals(newEmployee, extractEmployee(servletResponse));
         verify(employeeService).updateEmployee(newEmployee);
+    }
+
+    @Test
+    void shouldReturnErrorIfUpdateWithMismatchedIds() throws Exception {
+        LOGGER.info("shouldReturnErrorIfUpdateWithMismatchedIds()");
+
+        // given
+        Integer employeeToInteractionId = 256;
+        Employee newEmployee = getFakeEmployee(employeeToInteractionId);
+        String json = objectMapper.writeValueAsString(newEmployee);
+
+        // when
+        mockMvc.perform(put(URI_ID, 1, newEmployee)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .characterEncoding("utf-8")
+                        .accept(MediaType.ALL)
+
+                ) // then
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andExpect(content().string("Id mismatch"));
     }
 
     @Test
