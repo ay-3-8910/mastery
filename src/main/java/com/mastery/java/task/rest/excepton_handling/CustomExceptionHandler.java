@@ -22,21 +22,21 @@ public class CustomExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleNotFoundException(ResourceNotFoundException exception) {
         String message = exception.getMessage();
-        LOGGER.error(message);
+        LOGGER.error(message, exception);
         return message;
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleValidationsErrors(MethodArgumentNotValidException exception) {
-        LOGGER.error(exception.getMessage());
+        LOGGER.error(exception.getMessage(), exception);
         return exception.getBindingResult().getAllErrors().get(0).getDefaultMessage();
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleConstraintViolationException(ConstraintViolationException exception) {
-        LOGGER.error(exception.getMessage());
+        LOGGER.error(exception.getMessage(), exception);
         return "Validation error.";
     }
 
