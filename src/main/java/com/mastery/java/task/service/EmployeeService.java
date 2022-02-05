@@ -63,7 +63,6 @@ public class EmployeeService {
      * @return updated employee.
      */
     public Employee updateEmployee(Employee employee) {
-        Integer id = employee.getEmployeeId();
         return employeeDao.updateEmployee(employee);
     }
 
