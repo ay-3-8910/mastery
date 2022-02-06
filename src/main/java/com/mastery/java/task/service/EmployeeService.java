@@ -1,7 +1,10 @@
 package com.mastery.java.task.service;
 
-import com.mastery.java.task.dao.EmployeeDao;
+import com.mastery.java.task.dao.EmployeeJpaRepository;
 import com.mastery.java.task.dto.Employee;
+import com.mastery.java.task.rest.excepton_handling.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +16,14 @@ import java.util.List;
 @Service
 public class EmployeeService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeService.class);
+
+    public EmployeeService() {
+        LOGGER.debug("Employees service was created");
+    }
+
     @Autowired
-    private EmployeeDao employeeDao;
+    private EmployeeJpaRepository jpaRepository;
 
     /**
      * Employees list.
@@ -22,17 +31,19 @@ public class EmployeeService {
      * @return Employees list.
      */
     public List<Employee> getAllEmployees() {
-        return employeeDao.getAllEmployees();
+        return jpaRepository.findAll();
     }
 
     /**
-     * Get employee by Id.
+     * Get employee by employeeId.
      *
      * @param employeeId employee Id.
      * @return employee.
      */
     public Employee getEmployeeById(Integer employeeId) {
-        return employeeDao.getEmployeeById(employeeId);
+        return jpaRepository.findById(employeeId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(notFoundForThisIdMessage(employeeId)));
     }
 
     /**
@@ -43,7 +54,12 @@ public class EmployeeService {
      * @return employee.
      */
     public List<Employee> getEmployeesByName(String firstName, String lastName) {
-        return employeeDao.getEmployeesByName(firstName, lastName);
+        var employees = jpaRepository
+                .findByFirstNameContainsAndLastNameContains(firstName, lastName);
+        if (employees.isEmpty()) {
+            throw new ResourceNotFoundException("Nothing was found for these parameters");
+        }
+        return employees;
     }
 
     /**
@@ -53,7 +69,7 @@ public class EmployeeService {
      * @return saved employee.
      */
     public Employee createEmployee(Employee employee) {
-        return employeeDao.createEmployee(employee);
+        return jpaRepository.save(employee);
     }
 
     /**
@@ -63,16 +79,28 @@ public class EmployeeService {
      * @return updated employee.
      */
     public Employee updateEmployee(Employee employee) {
-        return employeeDao.updateEmployee(employee);
+        Integer employeeId = employee.getEmployeeId();
+        Employee employeeToUpdate = jpaRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException(notFoundForThisIdMessage(employeeId)));
+
+        employeeToUpdate.setFirstName(employee.getFirstName());
+        employeeToUpdate.setLastName(employee.getLastName());
+        employeeToUpdate.setDepartmentId(employee.getDepartmentId());
+        employeeToUpdate.setJobTitle(employee.getJobTitle());
+        employeeToUpdate.setGender(employee.getGender());
+        employeeToUpdate.setDateOfBirth(employee.getDateOfBirth());
+
+        return jpaRepository.save(employeeToUpdate);
     }
 
     /**
-     * Delete employee by Id.
+     * Delete employee by employeeId.
      *
      * @param employeeId employee Id.
      */
     public void deleteEmployee(Integer employeeId) {
-        employeeDao.deleteEmployee(employeeId);
+        jpaRepository.delete(jpaRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException(notFoundForThisIdMessage(employeeId))));
     }
 
     /**
@@ -81,6 +109,10 @@ public class EmployeeService {
      * @return the number of employees in the database.
      */
     public Integer getEmployeesCount() {
-        return employeeDao.getEmployeesCount();
+        return Math.toIntExact(jpaRepository.count());
+    }
+
+    private String notFoundForThisIdMessage(Integer employeeId) {
+        return String.format("No employee with id %s exists!", employeeId);
     }
 }
