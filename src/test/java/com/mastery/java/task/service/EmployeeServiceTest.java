@@ -38,25 +38,6 @@ class EmployeeServiceTest {
     EmployeeJpaRepository jpaRepository;
 
     @Test
-    void shouldFindAll() {
-        LOGGER.debug("shouldFindAll()");
-
-        // given
-        List<Employee> base = new ArrayList<>();
-        base.add(getFakeEmployee(1));
-        base.add(getFakeEmployee(2));
-        base.add(getFakeEmployee(3));
-        when(jpaRepository.findAll()).thenReturn(base);
-
-        // when
-        List<Employee> employees = employeeService.getAllEmployees();
-
-        // then
-        assertEquals(base, employees);
-        verify(jpaRepository).findAll();
-    }
-
-    @Test
     void shouldFindById() {
         LOGGER.debug("shouldFindById()");
 

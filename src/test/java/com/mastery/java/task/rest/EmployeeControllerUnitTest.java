@@ -16,7 +16,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -46,30 +45,6 @@ class EmployeeControllerUnitTest {
 
     @MockBean
     private EmployeeService employeeService;
-
-    @Test
-    public void shouldReturnEmployeesList() throws Exception {
-        LOGGER.debug("shouldReturnEmployeesList()");
-
-        // given
-        List<Employee> employees = new ArrayList<>();
-        employees.add(getFakeEmployee(1));
-        employees.add(getFakeEmployee(2));
-        when(employeeService.getAllEmployees()).thenReturn(employees);
-
-        // when
-        MockHttpServletResponse servletResponse = mockMvc.perform(get(URI)
-                        .accept(MediaType.APPLICATION_JSON)
-
-                ) // then
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-        assertNotNull(servletResponse);
-        assertEquals(2, extractEmployeeList(servletResponse).size());
-        assertEquals(employees, extractEmployeeList(servletResponse));
-        verify(employeeService).getAllEmployees();
-    }
 
     @Test
     void shouldReturnEmployeeById() throws Exception {
@@ -104,7 +79,7 @@ class EmployeeControllerUnitTest {
         when(employeeService.getEmployeesByName(firstName, lastName)).thenReturn(employeesList);
 
         // when
-        MockHttpServletResponse servletResponse = mockMvc.perform(get(URI + "/search")
+        MockHttpServletResponse servletResponse = mockMvc.perform(get(URI)
                         .param("firstName", firstName)
                         .param("lastName", lastName)
                         .accept(MediaType.APPLICATION_JSON)

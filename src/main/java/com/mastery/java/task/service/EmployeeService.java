@@ -26,15 +26,6 @@ public class EmployeeService {
     private EmployeeJpaRepository jpaRepository;
 
     /**
-     * Employees list.
-     *
-     * @return Employees list.
-     */
-    public List<Employee> getAllEmployees() {
-        return jpaRepository.findAll();
-    }
-
-    /**
      * Get employee by employeeId.
      *
      * @param employeeId employee Id.
