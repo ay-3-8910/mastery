@@ -37,22 +37,7 @@ public class EmployeeController {
     }
 
     /**
-     * Employees list.
-     *
-     * @return Employees list.
-     */
-    @ApiOperation(value = "Get all employees list", tags = "employee")
-    @ApiResponse(code = 200, message = "Employees list")
-    @GetMapping(produces = {"application/json"})
-    public List<Employee> getAllEmployees() {
-        LOGGER.info(" IN: getAllEmployees() - []");
-        var employees = employeeService.getAllEmployees();
-        LOGGER.info("OUT: getAllEmployees() - found {} employee(s)", employees.size());
-        return employees;
-    }
-
-    /**
-     * Get employee by Id.
+     * Get an employee by employee id.
      *
      * @param id employee Id.
      * @return employee.
@@ -72,23 +57,24 @@ public class EmployeeController {
     }
 
     /**
-     * Get employees by firstname and lastname.
+     * Get a list of employees with the ability to filter by name.
      *
      * @param firstName employee firstname.
      * @param lastName  employee lastname.
-     * @return employee.
+     * @return Employees list.
      */
-    @ApiOperation(value = "Get employees by firstname and lastname", tags = "employee")
+    @ApiOperation(value = "Get a list of employees with the ability to filter by name", tags = "employee")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Employees list"),
             @ApiResponse(code = 404, message = "Employees not found")
     })
-    @GetMapping(value = "/search", produces = {"application/json"})
-    public List<Employee> getEmployeesByName(@RequestParam(value = "firstName", defaultValue = "") String firstName,
-                                             @RequestParam(value = "lastName", defaultValue = "") String lastName) {
-        LOGGER.info(" IN: getEmployeeByName() - [{}, {}]", firstName, lastName);
+    @GetMapping(produces = {"application/json"})
+    public List<Employee> getEmployeesList(
+            @RequestParam(value = "firstName", defaultValue = "") String firstName,
+            @RequestParam(value = "lastName", defaultValue = "") String lastName) {
+        LOGGER.info(" IN: getEmployeesByName() - [FirstName={}, LastName={}]", firstName, lastName);
         var employees = employeeService.getEmployeesByName(firstName, lastName);
-        LOGGER.info("OUT: getEmployeeByName() - found {} employee(s)", employees.size());
+        LOGGER.info("OUT: getEmployeesByName() - found {} employee(s)", employees.size());
         return employees;
     }
 
