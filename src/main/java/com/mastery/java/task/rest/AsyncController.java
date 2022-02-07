@@ -21,11 +21,11 @@ import javax.validation.Valid;
 @Api(value = "async", tags = "async")
 public class AsyncController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncController.class);
-
     public AsyncController() {
         LOGGER.debug("Async producer controller was created");
     }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncController.class);
 
     @Autowired
     private JmsTemplate jmsTemplate;
