@@ -50,8 +50,8 @@ public class SpringFoxConfig {
                 .globalResponses(DELETE, defaultResponseMessage)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.ant("/employees/**"))
+                .apis(RequestHandlerSelectors.basePackage("com.mastery.java.task.rest"))
+                .paths(PathSelectors.any())
                 .build();
     }
 
