@@ -1,6 +1,7 @@
 package com.mastery.java.task.rest;
 
 import com.mastery.java.task.dto.Employee;
+import com.mastery.java.task.service.JmsEmployeeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -8,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,7 +28,7 @@ public class AsyncController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncController.class);
 
     @Autowired
-    private JmsTemplate jmsTemplate;
+    private JmsEmployeeService jmsService;
 
     /**
      * Send into queue to create new employee record.
@@ -41,6 +41,6 @@ public class AsyncController {
     @ResponseStatus(HttpStatus.OK)
     public void sendToQueueEmployee(@Valid @RequestBody Employee employee) {
         LOGGER.info(" IN: sendToQueueEmployee() - [{}]", employee);
-        jmsTemplate.convertAndSend("employee-queue", employee);
+        jmsService.sendEmployee(employee);
     }
 }
