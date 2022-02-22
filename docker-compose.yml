@@ -1,0 +1,29 @@
+version: "3"
+services:
+
+  db:
+    image: postgres
+    container_name: db
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: employeedb
+      POSTGRES_PASSWORD: fakepass
+      POSTGRES_DB: employeedb
+    volumes:
+      - ./docker-db-init.sql:/docker-entrypoint-initdb.d/docker-db-init.sql
+      - pgdata:/var/lib/postgresql/data
+
+  rest-app:
+    build: .
+    image: docker-rest-app
+    container_name: rest-app
+    ports:
+      - 8088:8088
+    environment:
+      POSTGRES_HOST: db
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
