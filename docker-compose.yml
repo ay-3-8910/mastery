@@ -15,8 +15,8 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   rest-app:
-    build: .
     image: docker-rest-app
+    build: .
     container_name: rest-app
     ports:
       - 8088:8088
@@ -24,6 +24,17 @@ services:
       POSTGRES_HOST: db
     depends_on:
       - db
+      - activemq
+
+  activemq:
+    image: webcenter/activemq:latest
+    container_name: activemq
+    ports:
+      - 8161:8161
+      - 61616:61616
+    environment:
+      ACTIVEMQ_ADMIN_LOGIN: admin
+      ACTIVEMQ_ADMIN_PASSWORD: admin
 
 volumes:
   pgdata:
