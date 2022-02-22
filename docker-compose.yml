@@ -1,0 +1,40 @@
+version: "3"
+services:
+
+  db:
+    image: postgres
+    container_name: db
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: employeedb
+      POSTGRES_PASSWORD: fakepass
+      POSTGRES_DB: employeedb
+    volumes:
+      - ./docker-db-init.sql:/docker-entrypoint-initdb.d/docker-db-init.sql
+      - pgdata:/var/lib/postgresql/data
+
+  rest-app:
+    image: docker-rest-app
+    build: .
+    container_name: rest-app
+    ports:
+      - 8088:8088
+    environment:
+      POSTGRES_HOST: db
+    depends_on:
+      - db
+      - activemq
+
+  activemq:
+    image: webcenter/activemq:latest
+    container_name: activemq
+    ports:
+      - 8161:8161
+      - 61616:61616
+    environment:
+      ACTIVEMQ_ADMIN_LOGIN: admin
+      ACTIVEMQ_ADMIN_PASSWORD: admin
+
+volumes:
+  pgdata:
