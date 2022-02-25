@@ -8,7 +8,6 @@ import org.springframework.context.annotation.PropertySource;
  * @author Sergey Tsynin
  */
 @SpringBootApplication
-@PropertySource({"classpath:sql.properties"})
 public class MainApp {
 
     public static void main(String[] args) {

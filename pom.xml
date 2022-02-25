@@ -99,6 +99,11 @@
             <artifactId>springfox-swagger-ui</artifactId>
             <version>${springfox-swagger2.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -132,6 +137,17 @@
                 </executions>
                 <configuration>
                     <mainClass>com.mastery.java.task.MainApp</mainClass>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>4.2.0</version>
+                <configuration>
+                    <user>employeedb</user>
+                    <password>fakepass</password>
+                    <url>jdbc:postgresql://localhost:5432/employeedb</url>
                 </configuration>
             </plugin>
         </plugins>
